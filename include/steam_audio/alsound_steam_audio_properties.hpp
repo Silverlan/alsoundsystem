@@ -6,7 +6,7 @@
 #define __ALSOUND_STEAM_AUDIO_PROPERTIES_HPP__
 
 #include "alsound_definitions.hpp"
-#include <util/util_overridable.hpp>
+#include <sharedutils/util_overridable.hpp>
 
 namespace al
 {

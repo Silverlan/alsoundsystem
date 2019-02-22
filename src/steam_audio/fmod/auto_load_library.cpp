@@ -3,12 +3,12 @@
 // https://valvesoftware.github.io/steam-audio/license.html
 //
 
-#include "../alsound_definitions.hpp"
+#include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
-#include <util/util.h>
+#include <sharedutils/util.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>

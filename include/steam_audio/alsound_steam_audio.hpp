@@ -12,7 +12,7 @@
 #include <memory>
 #include <functional>
 #include <vector>
-#include <uvec.h>
+#include <mathutil/uvec.h>
 #include <thread>
 #include <atomic>
 #include <mutex>

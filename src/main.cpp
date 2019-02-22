@@ -4,20 +4,10 @@
 
 #include "alsound_definitions.hpp"
 
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-#pragma comment(lib,"alure2.lib")
-#pragma comment(lib,"soft_oal.lib")
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
+#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #pragma comment(lib,"fmodstudio64_vc.lib")
 #pragma comment(lib,"fmod64_vc.lib")
 #endif
-
-#pragma comment(lib,"vfilesystem.lib")
-#pragma comment(lib,"util.lib")
-#pragma comment(lib,"mathutil.lib")
-#pragma comment(lib,"libvorbisfile.lib")
-#pragma comment(lib,"util_sound.lib")
-#pragma comment(lib,"libsamplerate.lib")
 
 #ifdef ALSOUNDSYSTEM_EXECUTABLE
 #include <iostream>

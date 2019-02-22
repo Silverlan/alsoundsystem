@@ -6,9 +6,9 @@
 
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 
-#include <util/scope_guard.h>
-#include <util/util_string.h>
-#include <filesystem.h>
+#include <sharedutils/scope_guard.h>
+#include <sharedutils/util_string.h>
+#include <fsys/filesystem.h>
 #include "alsound_coordinate_system.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include "steam_audio_fmod/audio_engine_settings.h"

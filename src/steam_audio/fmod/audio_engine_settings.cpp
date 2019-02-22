@@ -3,7 +3,7 @@
 // https://valvesoftware.github.io/steam-audio/license.html
 //
 
-#include "../alsound_definitions.hpp"
+#include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include "audio_engine_settings.h"
 #include "auto_load_library.h"

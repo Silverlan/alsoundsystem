@@ -12,7 +12,7 @@
 #include <fmod_studio.hpp>
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #include "steam_audio_effects.hpp"
-#include <util/scope_guard.h>
+#include <sharedutils/scope_guard.h>
 #endif
 #endif
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
