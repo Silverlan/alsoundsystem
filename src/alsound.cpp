@@ -13,8 +13,8 @@
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include <fmod_studio.hpp>
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-#include "steam_audio_effects.hpp"
-#include "alsound_steam_audio.hpp"
+#include "steam_audio/fmod/steam_audio_effects.hpp"
+#include "steam_audio/alsound_steam_audio.hpp"
 #endif
 #endif
 
@@ -56,7 +56,7 @@ al::SoundSource::~SoundSource()
 
 	m_handle.Invalidate();
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_source->release();
+	m_source->destroy();
 #endif
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 	ClearSteamSoundEffects();
@@ -160,7 +160,7 @@ bool al::SoundSource::AddEffect(Effect &effect,uint32_t &slotId,const Effect::Pa
 		++m_nextAuxSlot;
 
 	m_effects.push_back({effect.shared_from_this(),slotId});
-	m_source->setAuxiliarySendFilter(&slot->GetALSlot(),slotId,reinterpret_cast<const alure::FilterParams&>(params));
+	m_source->setAuxiliarySendFilter(slot->GetALSlot(),slotId,reinterpret_cast<const alure::FilterParams&>(params));
 	return true;
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	// FMOD TODO
@@ -268,7 +268,9 @@ void al::SoundSource::SetFrameOffset(uint64_t offset)
 uint64_t al::SoundSource::GetFrameOffset(uint64_t *latency) const
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_source->getOffset();
+	if(latency != nullptr)
+		*latency = m_source->getSampleOffsetLatency().first;
+	return m_source->getSampleOffset();
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	if(m_source != nullptr)
 	{
@@ -331,7 +333,7 @@ void al::SoundSource::Play()
 		m_bSchedulePlay = true;
 		return;
 	}
-	m_source->play(buf->GetALBuffer());
+	m_source->play(*buf->GetALBuffer());
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	InitializeChannel();
 	m_soundSourceData.offset = 0ull;

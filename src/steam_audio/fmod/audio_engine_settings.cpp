@@ -5,9 +5,9 @@
 
 #include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-#include "audio_engine_settings.h"
-#include "auto_load_library.h"
-#include "../alsound_steam_audio.hpp"
+#include "steam_audio/fmod/audio_engine_settings.h"
+#include "steam_audio/fmod/auto_load_library.h"
+#include "steam_audio/alsound_steam_audio.hpp"
 
 std::mutex                      GlobalState::sMutex{};
 std::shared_ptr<GlobalState>    GlobalState::sAudioEngineSettings{ nullptr };

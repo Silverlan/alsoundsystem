@@ -29,7 +29,7 @@ namespace alure
 };
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-#include "alsound_steam_audio_properties.hpp"
+#include "steam_audio/alsound_steam_audio_properties.hpp"
 #endif
 namespace FMOD
 {

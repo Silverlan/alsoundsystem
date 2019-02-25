@@ -24,7 +24,7 @@ al::SoundBuffer *al::SoundSystem::LoadSound(const std::string &path,bool bConver
 			return cache.mono.get(); // Return mono buffer
 	}
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	alure::Buffer *alBuf = nullptr;
+	alure::Buffer alBuf = nullptr;
 	auto userData = std::make_shared<impl::BufferLoadData>(*this);
 	if(bConvertToMono == true)
 		userData->flags |= impl::BufferLoadData::Flags::ConvertToMono;

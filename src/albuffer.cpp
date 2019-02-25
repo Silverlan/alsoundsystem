@@ -27,7 +27,7 @@ FMOD::Sound *al::SoundBuffer::GetFMODSound() {return m_fmSound.get();}
 al::SoundBuffer::~SoundBuffer()
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_context.removeBuffer(m_buffer);
+	m_context.removeBuffer(*m_buffer);
 #endif
 }
 
@@ -148,10 +148,10 @@ std::pair<uint64_t,uint64_t> al::SoundBuffer::GetLoopFramePoints() const
 #endif
 }
 
-const std::string &al::SoundBuffer::GetName() const
+std::string al::SoundBuffer::GetName() const
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_buffer->getName();
+	return m_buffer->getName().data();
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	// FMOD TODO
 	static std::string r = "";
@@ -161,7 +161,7 @@ const std::string &al::SoundBuffer::GetName() const
 bool al::SoundBuffer::IsInUse() const
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_buffer->isInUse();
+	return m_buffer->getSourceCount() > 0;
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	// FMOD TODO
 	return true;

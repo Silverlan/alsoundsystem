@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../alsound_definitions.hpp"
+#include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include <string.h>
 #include <exception>

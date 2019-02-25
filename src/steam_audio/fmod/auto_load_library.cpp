@@ -19,7 +19,7 @@
 #endif
 #endif
 
-#include "auto_load_library.h"
+#include "steam_audio/fmod/auto_load_library.h"
 SteamAudioApi gApi;
 #if defined(_WIN32) || defined(_WIN64)
 #define PLUGIN_LIBRARY_NAME L"phonon_fmod.dll"

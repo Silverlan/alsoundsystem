@@ -62,13 +62,20 @@ link_external_library(vfilesystem)
 link_external_library(libvorbis)
 link_external_library(libogg)
 link_external_library(util_sound)
+link_external_library(steam_audio)
+link_external_library(util_sound)
+
+# FMOD
+link_external_library(fmod)
+link_external_library(fmod_studio)
+link_external_library(libsamplerate)
 
 add_include_dir(glm)
 add_include_dir(MPAHeader)
 
 add_external_library(libvorbisfile)
 
-set(CONFIG_UNDERLYING_LIBRARY "Alure" CACHE STRING "Audio Library")
+set(CONFIG_UNDERLYING_LIBRARY "FMOD" CACHE STRING "Audio Library")
 set_property(CACHE CONFIG_UNDERLYING_LIBRARY PROPERTY STRINGS Alure FMOD)
 
 set(DEFINITIONS
@@ -79,7 +86,7 @@ set(DEFINITIONS
 if(CONFIG_UNDERLYING_LIBRARY MATCHES "Alure")
 	list(APPEND DEFINITIONS ALSYS_LIBRARY_TYPE=0)
 	link_external_library(alure)
-	add_external_library(openal_soft)
+	link_external_library(openal_soft)
 else()
 	list(APPEND DEFINITIONS ALSYS_LIBRARY_TYPE=1)
 	add_include_dir(fmod)

@@ -16,7 +16,7 @@
 #include <fmod_studio.hpp>
 #include <fmod_errors.h>
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-#include "steam_audio_effects.hpp"
+#include "steam_audio/fmod/steam_audio_effects.hpp"
 #endif
 #endif
 

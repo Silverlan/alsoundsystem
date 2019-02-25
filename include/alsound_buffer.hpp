@@ -42,7 +42,7 @@ namespace al
 		void SetLoopTimePoints(float tStart,float tEnd);
 		// GetSources() ?
 
-		const std::string &GetName() const;
+		std::string GetName() const;
 		bool IsInUse() const;
 	private:
 		friend SoundSystem;

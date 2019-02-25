@@ -20,7 +20,6 @@ uint32_t al::Decoder::GetFrequency() const {return m_decoder->getFrequency();}
 al::ChannelConfig al::Decoder::GetChannelConfig() const {return static_cast<ChannelConfig>(m_decoder->getChannelConfig());}
 al::SampleType al::Decoder::GetSampleType() const {return static_cast<SampleType>(m_decoder->getSampleType());}
 uint64_t al::Decoder::GetLength() const {return m_decoder->getLength();}
-uint64_t al::Decoder::GetPosition() const {return m_decoder->getPosition();}
 std::pair<uint64_t,uint64_t> al::Decoder::GetLoopFramePoints() const {return m_decoder->getLoopPoints();}
 bool al::Decoder::Seek(uint64_t frame) {return m_decoder->seek(frame);}
 

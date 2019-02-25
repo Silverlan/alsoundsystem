@@ -5,7 +5,7 @@
 
 #include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-#include "steamaudio_fmod.h"
+#include "steam_audio/fmod/steamaudio_fmod.h"
 
 extern FMOD_DSP_DESCRIPTION gSpatializerEffect;
 extern FMOD_DSP_DESCRIPTION gMixEffect;

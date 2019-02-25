@@ -8,12 +8,12 @@
 #include <algorithm>
 #include <cassert>
 #include <vector>
-#include "auto_load_library.h"
-#include "audio_engine_settings.h"
-#include "environment_proxy.h"
-#include "../steam_audio_effects.hpp"
-#include "../alsound_steam_audio.hpp"
-#include "../alsound_coordinate_system.hpp"
+#include "steam_audio/fmod/auto_load_library.h"
+#include "steam_audio/fmod/audio_engine_settings.h"
+#include "steam_audio/fmod/environment_proxy.h"
+#include "steam_audio/fmod/steam_audio_effects.hpp"
+#include "steam_audio/alsound_steam_audio.hpp"
+#include "alsound_coordinate_system.hpp"
 
 #include <string>
 

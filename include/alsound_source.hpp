@@ -23,7 +23,7 @@
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 namespace alure {class Source;};
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-#include "alsound_steam_audio_properties.hpp"
+#include "steam_audio/alsound_steam_audio_properties.hpp"
 namespace FMOD {class Channel; class ChannelGroup; class DSP;};
 #endif
 namespace al

@@ -15,7 +15,7 @@ al::AuxiliaryEffectSlot::AuxiliaryEffectSlot(alure::AuxiliaryEffectSlot *slot)
 al::AuxiliaryEffectSlot::~AuxiliaryEffectSlot()
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_slot->release();
+	m_slot->destroy();
 #endif
 }
 
@@ -45,7 +45,7 @@ bool al::AuxiliaryEffectSlot::GetSendAuto() const {return m_bSendAuto;}
 void al::AuxiliaryEffectSlot::ApplyEffect(const Effect &effect)
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_slot->applyEffect(&effect.GetALEffect());
+	m_slot->applyEffect(effect.GetALEffect());
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	// FMOD TODO
 #endif
@@ -54,7 +54,7 @@ void al::AuxiliaryEffectSlot::ApplyEffect(const Effect &effect)
 bool al::AuxiliaryEffectSlot::IsInUse() const
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_slot->isInUse();
+	return m_slot->getUseCount() > 0;
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	// FMOD TODO
 	return true;

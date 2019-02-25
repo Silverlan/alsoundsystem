@@ -31,7 +31,6 @@ namespace al
 		virtual std::pair<uint64_t,uint64_t> GetLoopFramePoints() const override;
 
 		bool Seek(uint64_t frame);
-		uint64_t GetPosition() const;
 	private:
 		friend SoundSystem;
 

@@ -4,7 +4,7 @@
 
 #include "steam_audio/alsound_steam_audio.hpp"
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-#include "steam_audio_fmod/audio_engine_settings.h"
+#include "steam_audio/fmod/audio_engine_settings.h"
 
 static ipl::Context *s_context = nullptr;
 void ipl::check_result(IPLerror err)

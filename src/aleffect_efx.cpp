@@ -14,9 +14,9 @@
 #endif
 
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-static alure::ALContext *apply_effect_type(alure::Effect *effect,int32_t newType,const std::string &typeName,ALuint &effectId)
+static alure::Context *apply_effect_type(alure::Effect *effect,int32_t newType,const std::string &typeName,ALuint &effectId)
 {
-	auto *alEffect = static_cast<alure::ALEffect*>(effect);
+	auto *alEffect = static_cast<alure::Effect*>(effect);
 	auto *context = alEffect->getContext();
 	if(context == nullptr)
 		return nullptr;

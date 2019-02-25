@@ -6,11 +6,11 @@
 #include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include <vector>
-#include "environment_proxy.h"
-#include "auto_load_library.h"
-#include "../steam_audio_effects.hpp"
-#include "../alsound_steam_audio.hpp"
-#include "../alsound_coordinate_system.hpp"
+#include "steam_audio/fmod/environment_proxy.h"
+#include "steam_audio/fmod/auto_load_library.h"
+#include "steam_audio/fmod/steam_audio_effects.hpp"
+#include "steam_audio/alsound_steam_audio.hpp"
+#include "alsound_coordinate_system.hpp"
 
 FMOD_DSP_PARAMETER_DESC gReverbParamIndirectBinaural = { FMOD_DSP_PARAMETER_TYPE_BOOL, "IndirBinaural", "", "Spatialize reverb using HRTF." };
 FMOD_DSP_PARAMETER_DESC gReverbParamSimulationType = { FMOD_DSP_PARAMETER_TYPE_INT, "IndirType", "", "Real-time or baked." };

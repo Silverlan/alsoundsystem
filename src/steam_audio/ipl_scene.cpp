@@ -11,8 +11,8 @@
 #include <fsys/filesystem.h>
 #include "alsound_coordinate_system.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-#include "steam_audio_fmod/audio_engine_settings.h"
-#include "steam_audio_fmod/environment_proxy.h"
+#include "steam_audio/fmod/audio_engine_settings.h"
+#include "steam_audio/fmod/environment_proxy.h"
 #endif
 //#include <networkstate.h>
 //#include <material.h>
