@@ -7,6 +7,7 @@
 #include <AL/alure2.h>
 #endif
 
+#pragma optimize("",off)
 al::impl::BufferLoadData::BufferLoadData(SoundSystem &sys)
 	: soundSystem(sys)
 {}
@@ -60,3 +61,4 @@ std::pair<float,float> al::impl::BufferBase::GetLoopTimePoints() const
 
 bool al::impl::BufferBase::IsMono() const {return (GetChannelConfig() == al::ChannelConfig::Mono) ? true : false;}
 bool al::impl::BufferBase::IsStereo() const {return (GetChannelConfig() == al::ChannelConfig::Stereo) ? true : false;}
+#pragma optimize("",on)

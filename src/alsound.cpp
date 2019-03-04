@@ -18,6 +18,7 @@
 #endif
 #endif
 
+#pragma optimize("",off)
 namespace al
 {
 	DEFINE_BASE_HANDLE(DLLALSYS,SoundSource,SoundSource);
@@ -1124,3 +1125,4 @@ bool al::SoundSource::CheckResultAndUpdateValidity(uint32_t result) const
 }
 #endif
 
+#pragma optimize("",on)

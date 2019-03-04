@@ -11,6 +11,7 @@
 #include <fmod_studio.hpp>
 #endif
 
+#pragma optimize("",off)
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 al::SoundBuffer::SoundBuffer(alure::Context &context,alure::Buffer *buffer,const std::string &path)
 	: impl::BufferBase(path),m_context(context),m_buffer(buffer)
@@ -41,7 +42,9 @@ bool al::SoundBuffer::IsReady() const
 	uint32_t percentBuffered;
 	bool starving,diskBusy;
 	al::fmod::check_result(m_fmSound->getOpenState(&openState,&percentBuffered,&starving,&diskBusy));
-	return openState == FMOD_OPENSTATE_READY;
+	return openState != FMOD_OPENSTATE_LOADING && 
+		openState != FMOD_OPENSTATE_ERROR && 
+		openState != FMOD_OPENSTATE_CONNECTING; // TODO: What about FMOD_OPENSTATE_BUFFERING?
 #endif
 }
 
@@ -62,8 +65,10 @@ uint32_t al::SoundBuffer::GetFrequency() const
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	return m_buffer->getFrequency();
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-	return 0u;
+	float frequency;
+	int32_t priority;
+	al::fmod::check_result(m_fmSound->getDefaults(&frequency,&priority));
+	return static_cast<uint32_t>(frequency);
 #endif
 }
 al::ChannelConfig al::SoundBuffer::GetChannelConfig() const
@@ -167,3 +172,4 @@ bool al::SoundBuffer::IsInUse() const
 	return true;
 #endif
 }
+#pragma optimize("",on)
