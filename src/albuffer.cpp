@@ -56,7 +56,7 @@ uint64_t al::SoundBuffer::GetLength() const
 	return m_buffer->getLength();
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	auto length = 0u;
-	al::fmod::check_result(m_fmSound->getLength(&length,FMOD_TIMEUNIT_MS));
+	al::fmod::check_result(m_fmSound->getLength(&length,FMOD_TIMEUNIT_PCM));
 	return length;
 #endif
 }
