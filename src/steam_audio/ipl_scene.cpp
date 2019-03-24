@@ -35,7 +35,10 @@ void ipl::Scene::FinalizeData::Stop()
 	threadMutex.unlock();
 	iplCancelBake();
 	for(auto &t : threadsCpy)
-		t->join();
+	{
+		if(t->joinable())
+			t->join();
+	}
 }
 std::shared_ptr<std::thread> ipl::Scene::FinalizeData::AddThread(const std::function<void(void)> &f)
 {
