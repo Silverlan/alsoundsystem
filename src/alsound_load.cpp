@@ -9,6 +9,7 @@
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include <fmod_studio.hpp>
 #endif
+#include <cstring>
 
 al::SoundBuffer *al::SoundSystem::LoadSound(const std::string &path,bool bConvertToMono,bool bAsync)
 {

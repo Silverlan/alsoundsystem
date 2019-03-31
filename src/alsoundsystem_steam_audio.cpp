@@ -28,7 +28,7 @@ ipl::Scene *al::SoundSystem::InitializeSteamAudioScene()
 	if(m_iplContext == nullptr)
 		return nullptr;
 	// TODO
-	m_iplContext->SetLogHandler([](std::string &msg) {
+	m_iplContext->SetLogHandler([](std::string msg) {
 		std::cout<<"[STEAM AUDIO] Log: "<<msg<<std::endl;
 		//throw std::runtime_error("Steam audio log: " +msg);
 	});
