@@ -124,6 +124,10 @@ file(GLOB_RECURSE SRC_FILES
 )
 
 add_library(${PROJ_NAME} ${LIB_TYPE} ${SRC_FILES})
+if(WIN32)
+	target_compile_options(${PROJ_NAME} PRIVATE /wd4251)
+	target_compile_options(${PROJ_NAME} PRIVATE /wd4996)
+endif()
 def_vs_filters("${SRC_FILES}")
 
 foreach(LIB IN LISTS LIBRARIES)
