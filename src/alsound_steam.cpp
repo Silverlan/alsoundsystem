@@ -143,6 +143,8 @@ void al::SoundSource::SetSteamAudioEffectsEnabled(bool b)
 	});
 }
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
+extern FMOD_DSP_DESCRIPTION gReverbEffect;
+extern FMOD_DSP_DESCRIPTION gSpatializerEffect;
 void al::SoundSource::UpdateSteamAudioDSPEffects()
 {
 	if(m_system.IsSteamAudioEnabled() == false)
@@ -247,8 +249,6 @@ void al::SoundSource::SetSteamAudioSpatializerDSPEnabled(bool b,bool bForceReloa
 		IPLint32 identifier;
 		if(m_steamAudioData->dspSpatializer != nullptr || iplScene == nullptr || iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(),ipl::Scene::DSPEffect::Spatializer,identifier) == false)
 			return;
-		extern FMOD_DSP_DESCRIPTION gSpatializerEffect;
-
 		FMOD::DSP *dsp;
 		al::fmod::check_result(m_system.GetFMODLowLevelSystem().createDSP(&gSpatializerEffect,&dsp));
 
@@ -280,8 +280,6 @@ void al::SoundSource::SetSteamAudioReverbDSPEnabled(bool b,bool bForceReload)
 		IPLint32 identifier;
 		if(m_steamAudioData->dspReverb != nullptr || iplScene == nullptr || iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(),ipl::Scene::DSPEffect::Reverb,identifier) == false)
 			return;
-		extern FMOD_DSP_DESCRIPTION gReverbEffect;
-
 		FMOD::DSP *dsp;
 		al::fmod::check_result(m_system.GetFMODLowLevelSystem().createDSP(&gReverbEffect,&dsp));
 

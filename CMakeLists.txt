@@ -66,8 +66,6 @@ link_external_library(steam_audio)
 link_external_library(util_sound)
 
 # FMOD
-link_external_library(fmod)
-link_external_library(fmod_studio)
 link_external_library(libsamplerate)
 
 add_include_dir(glm)
@@ -90,6 +88,8 @@ if(CONFIG_UNDERLYING_LIBRARY MATCHES "Alure")
 else()
 	list(APPEND DEFINITIONS ALSYS_LIBRARY_TYPE=1)
 	add_include_dir(fmod)
+	link_external_library(fmod)
+	link_external_library(fmod_studio)
 endif()
 
 ##### CONFIGURATION #####
