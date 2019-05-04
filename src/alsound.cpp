@@ -18,7 +18,6 @@
 #endif
 #endif
 
-#pragma optimize("",off)
 namespace al
 {
 	DEFINE_BASE_HANDLE(DLLALSYS,SoundSource,SoundSource);
@@ -1124,5 +1123,3 @@ bool al::SoundSource::CheckResultAndUpdateValidity(uint32_t result) const
 	return result == FMOD_OK;
 }
 #endif
-
-#pragma optimize("",on)
