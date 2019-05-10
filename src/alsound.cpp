@@ -514,7 +514,9 @@ void al::SoundSource::SetGainRange(float minGain,float maxGain)
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	m_source->setGainRange(minGain,maxGain);
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
+	m_soundSourceData.minGain = minGain;
+	m_soundSourceData.maxGain = maxGain;
+	SetGain(umath::clamp(GetGain(),minGain,maxGain));
 #endif
 }
 std::pair<float,float> al::SoundSource::GetGainRange() const
@@ -522,8 +524,7 @@ std::pair<float,float> al::SoundSource::GetGainRange() const
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	return m_source->getGainRange();
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-	return {0.f,0.f};
+	return {m_soundSourceData.minGain,m_soundSourceData.maxGain};
 #endif
 }
 void al::SoundSource::SetMinGain(float gain) {SetGainRange(gain,GetMaxGain());}
@@ -532,8 +533,7 @@ float al::SoundSource::GetMinGain() const
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	return m_source->getMinGain();
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-	return 0.f;
+	return m_soundSourceData.minGain;
 #endif
 }
 void al::SoundSource::SetMaxGain(float gain) {SetGainRange(GetMinGain(),gain);}
@@ -542,8 +542,7 @@ float al::SoundSource::GetMaxGain() const
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	return m_source->getMaxGain();
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-	return 0.f;
+	return m_soundSourceData.maxGain;
 #endif
 }
 

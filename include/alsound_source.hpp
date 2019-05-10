@@ -252,12 +252,14 @@ namespace al
 			bool looping = false;
 			float pitch = 1.f;
 			float gain = 1.f;
+			float minGain = 0.f;
+			float maxGain = 1.f;
 			std::pair<float,float> distanceRange = {1.f,10'000.f};
 			Vector3 position = {};
 			Vector3 velocity = {};
 			std::pair<float,float> coneAngles = {360.f,360.f};
 			float dopplerFactor = 1.f;
-			bool relativeToListener = true;
+			bool relativeToListener = false;
 		};
 		void UpdateMode();
 		bool Is3D() const;
