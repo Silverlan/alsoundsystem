@@ -281,7 +281,11 @@ uint64_t al::SoundSource::GetFrameOffset(uint64_t *latency) const
 	return m_soundSourceData.offset;
 #endif
 }
-void al::SoundSource::SetOffset(float offset) {SetFrameOffset(offset *GetFrameLength());}
+void al::SoundSource::SetOffset(float offset)
+{
+	offset = umath::clamp(offset,0.f,1.f);
+	SetFrameOffset(offset *GetFrameLength());
+}
 void al::SoundSource::SetTimeOffset(float offset)
 {
 	auto dur = GetDuration();
