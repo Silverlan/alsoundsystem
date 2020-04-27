@@ -26,7 +26,7 @@ void al::fmod::check_result(uint32_t r)
 	if(r != FMOD_OK)
 	{
 		std::cout<<"[FMOD] Error: "<<std::string(FMOD_ErrorString(static_cast<FMOD_RESULT>(r)))<<std::endl;
-		throw std::runtime_error("FMOD error: " +std::string(FMOD_ErrorString(static_cast<FMOD_RESULT>(r))));
+		// throw std::runtime_error("FMOD error: " +std::string(FMOD_ErrorString(static_cast<FMOD_RESULT>(r))));
 	}
 }
 #endif
