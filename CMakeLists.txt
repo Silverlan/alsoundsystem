@@ -63,13 +63,11 @@ link_external_library(libvorbis)
 link_external_library(libogg)
 link_external_library(util_sound)
 link_external_library(steam_audio)
-link_external_library(util_sound)
 
 # FMOD
 link_external_library(libsamplerate)
 
 add_include_dir(glm)
-add_include_dir(MPAHeader)
 
 add_external_library(libvorbisfile)
 
