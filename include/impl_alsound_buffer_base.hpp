@@ -9,6 +9,7 @@
 #include "alsound_enums.hpp"
 #include <cinttypes>
 #include <memory>
+#include <string>
 #include <mathutil/umath.h>
 
 #pragma warning(push)
