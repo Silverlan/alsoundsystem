@@ -372,6 +372,13 @@ void al::SoundSource::Resume()
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	m_source->resume();
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
+	if(m_source == nullptr)
+	{
+		auto offset = GetFrameOffset();
+		Play();
+		SetFrameOffset(offset);
+		return;
+	}
 	if(m_source != nullptr)
 		CheckResultAndUpdateValidity(m_source->setPaused(false));
 #endif
