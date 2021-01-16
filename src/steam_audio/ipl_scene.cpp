@@ -180,7 +180,7 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f,const Final
 
 	m_finalizeData->AddThread([this,f,fOnComplete,errorHandler,fStageProgress,info]() {
 		auto iplContext = m_context->GetIplContext();
-		ScopeGuard sgScene {};
+		util::ScopeGuard sgScene {};
 		Vector3 min {std::numeric_limits<float>::max(),std::numeric_limits<float>::max(),std::numeric_limits<float>::max()};
 		Vector3 max {std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest()};
 		auto bBakeData = false;
@@ -281,9 +281,9 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f,const Final
 #if IPL_ENABLE_PROBES != 0
 		if(bBakeData == true)
 		{
-			ScopeGuard sgProbeBox {};
-			ScopeGuard sgProbeBatch {};
-			ScopeGuard sgProbeManager {};
+			util::ScopeGuard sgProbeBox {};
+			util::ScopeGuard sgProbeBatch {};
+			util::ScopeGuard sgProbeManager {};
 
 			// Generate probes
 			if(m_probeBoxes.empty() == false)
@@ -431,7 +431,7 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f,const Final
 			m_iplEnv = std::shared_ptr<void>(envHandle,[](IPLhandle envHandle) {
 				iplDestroyEnvironment(&envHandle);
 			});
-			ScopeGuard sgEnvironment([this]() mutable {
+			util::ScopeGuard sgEnvironment([this]() mutable {
 				m_iplEnv = nullptr;
 			});
 

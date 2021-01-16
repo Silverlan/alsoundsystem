@@ -238,7 +238,7 @@ void al::SoundSource::SetSteamAudioSpatializerDSPEnabled(bool b,bool bForceReloa
 	m_bSteamAudioSpatializerEnabled = b;
 	if(m_steamAudioData == nullptr)
 		return;
-	ScopeGuard sg([this]() {
+	util::ScopeGuard sg([this]() {
 		ClearSteamAudioSpatializerDSP();
 	});
 	if(b == false)
@@ -269,7 +269,7 @@ void al::SoundSource::SetSteamAudioReverbDSPEnabled(bool b,bool bForceReload)
 	m_bSteamAudioReverbEnabled = b;
 	if(m_steamAudioData == nullptr)
 		return;
-	ScopeGuard sg([this]() {
+	util::ScopeGuard sg([this]() {
 		ClearSteamAudioReverbDSP();
 	});
 	if(b == false)
