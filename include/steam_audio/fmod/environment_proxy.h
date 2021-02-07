@@ -5,6 +5,7 @@
 
 #pragma once
 
+#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include "audio_engine_settings.h"
@@ -117,4 +118,5 @@ extern "C"
      */
     F_EXPORT void F_CALL iplFmodResetEnvironment();
 }
+#endif
 #endif

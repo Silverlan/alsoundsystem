@@ -3,6 +3,7 @@
 // https://valvesoftware.github.io/steam-audio/license.html
 //
 
+#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include "steam_audio/fmod/audio_engine_settings.h"
@@ -79,4 +80,5 @@ void F_CALL iplFmodResetAudioEngine()
 {
     GlobalState::destroy();
 }
+#endif
 #endif

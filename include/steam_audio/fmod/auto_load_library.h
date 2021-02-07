@@ -5,6 +5,7 @@
 
 #pragma once
 
+#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include <phonon.h>
@@ -176,4 +177,5 @@ struct SteamAudioApi
 };
 
 extern SteamAudioApi gApi;
+#endif
 #endif

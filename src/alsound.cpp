@@ -1120,7 +1120,9 @@ void al::SoundSource::InitializeChannel()
 	SetConeAngles(m_soundSourceData.coneAngles.first,m_soundSourceData.coneAngles.second);
 	SetDopplerFactor(m_soundSourceData.dopplerFactor);
 	SetRelative(m_soundSourceData.relativeToListener);
+#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 	SetChannelGroup(GetChannelGroup());
+#endif
 }
 bool al::SoundSource::CheckResultAndUpdateValidity(uint32_t result) const
 {

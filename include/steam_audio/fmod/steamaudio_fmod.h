@@ -5,6 +5,7 @@
 
 #pragma once
 
+#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include <fmod.hpp>
@@ -19,4 +20,5 @@ IPLAudioFormat audioFormatForNumChannels(int numChannels);
 /** Converts a 3D vector from Unity's coordinate system to Steam Audio's coordinate system.
 */
 IPLVector3 convertVector(float x, float y, float z);
+#endif
 #endif

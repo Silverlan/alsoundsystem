@@ -3,6 +3,7 @@
 // https://valvesoftware.github.io/steam-audio/license.html
 //
 
+#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #include "alsound_definitions.hpp"
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 #include <stdlib.h>
@@ -217,5 +218,6 @@ static void onLoad()
 {
     loadLibrary();
 }
+#endif
 #endif
 #endif
