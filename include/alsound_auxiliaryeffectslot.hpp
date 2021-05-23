@@ -10,39 +10,31 @@
 
 #pragma warning(push)
 #pragma warning(disable:4251)
-namespace alure {class AuxiliaryEffectSlot;};
 namespace al
 {
-	class SoundSystem;
-	class Effect;
-	class DLLALSYS AuxiliaryEffectSlot
+	class ISoundSystem;
+	class IEffect;
+	class DLLALSYS IAuxiliaryEffectSlot
 	{
 	public:
-		~AuxiliaryEffectSlot();
+		virtual ~IAuxiliaryEffectSlot() {}
 
-		void SetGain(float gain);
-		float GetGain() const;
+		virtual void SetGain(float gain)=0;
+		virtual float GetGain() const=0;
 
-		void SetSendAuto(bool bAuto);
-		bool GetSendAuto() const;
+		virtual void SetSendAuto(bool bAuto)=0;
+		virtual bool GetSendAuto() const=0;
 
-		void ApplyEffect(const Effect &effect);
+		virtual void ApplyEffect(const IEffect &effect)=0;
 
-		bool IsInUse() const;
-
-		const alure::AuxiliaryEffectSlot &GetALSlot() const;
-		alure::AuxiliaryEffectSlot &GetALSlot();
+		virtual bool IsInUse() const=0;
 	private:
-		AuxiliaryEffectSlot(alure::AuxiliaryEffectSlot *slot);
+		IAuxiliaryEffectSlot();
 
-		alure::AuxiliaryEffectSlot *m_slot = nullptr;
-		float m_gain = 1.f;
-		bool m_bSendAuto = true;
-
-		friend SoundSystem;
+		friend ISoundSystem;
 	};
-	using PAuxiliaryEffectSlot = std::shared_ptr<AuxiliaryEffectSlot>;
-	using WPAuxiliaryEffectSlot = std::weak_ptr<AuxiliaryEffectSlot>;
+	using PAuxiliaryEffectSlot = std::shared_ptr<IAuxiliaryEffectSlot>;
+	using WPAuxiliaryEffectSlot = std::weak_ptr<IAuxiliaryEffectSlot>;
 };
 #pragma warning(pop)
 

@@ -15,42 +15,38 @@ namespace alure {class Listener;};
 #endif
 namespace al
 {
-	class SoundSystem;
-	class DLLALSYS Listener
+	class ISoundSystem;
+	class DLLALSYS IListener
 	{
 	public:
-		~Listener()=default;
+		~IListener()=default;
 
-		void SetGain(float gain);
+		virtual void SetGain(float gain);
 		float GetGain() const;
 
-		void SetPosition(const Vector3 &pos);
+		virtual void SetPosition(const Vector3 &pos);
 		const Vector3 &GetPosition() const;
 
-		void SetVelocity(const Vector3 &vel);
+		virtual void SetVelocity(const Vector3 &vel);
 		const Vector3 &GetVelocity() const;
 
-		void SetOrientation(const Vector3 &at,const Vector3 &up);
+		virtual void SetOrientation(const Vector3 &at,const Vector3 &up);
 		const std::pair<Vector3,Vector3> &GetOrientation() const;
 
 		float GetMetersPerUnit() const;
 		void SetMetersPerUnit(float mu);
-	private:
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-		Listener(alure::Listener &listener);
-		alure::Listener &m_listener;
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-		Listener(al::SoundSystem &system);
-		al::SoundSystem &m_soundSystem;
-#endif
-
+	protected:
+		IListener(al::ISoundSystem &system);
+		virtual void DoSetMetersPerUnit(float mu)=0;
+		
+		al::ISoundSystem &m_soundSystem;
 		float m_gain = 1.f;
 		Vector3 m_position = {};
 		Vector3 m_velocity = {};
 		std::pair<Vector3,Vector3> m_orientation = {};
 		float m_metersPerUnit = 1.f;
 
-		friend SoundSystem;
+		friend ISoundSystem;
 	};
 };
 #pragma warning(pop)

@@ -23,56 +23,33 @@ namespace FMOD
 namespace al
 {
 	class SoundSystem;
-	class DLLALSYS SoundBuffer
-		: public impl::BufferBase,public std::enable_shared_from_this<SoundBuffer>
+	class DLLALSYS ISoundBuffer
+		: public impl::BufferBase,public std::enable_shared_from_this<ISoundBuffer>
 	{
 	public:
-		~SoundBuffer();
+		virtual ~ISoundBuffer() override {}
 
-		bool IsReady() const;
+		virtual bool IsReady() const=0;
 
-		virtual uint32_t GetFrequency() const override;
-		virtual ChannelConfig GetChannelConfig() const override;
-		virtual SampleType GetSampleType() const override;
-		virtual uint64_t GetLength() const override;
-		virtual std::pair<uint64_t,uint64_t> GetLoopFramePoints() const override;
-
-		uint32_t GetSize() const;
-		void SetLoopFramePoints(uint32_t start,uint32_t end);
-		void SetLoopTimePoints(float tStart,float tEnd);
+		virtual uint32_t GetSize() const=0;
+		virtual void SetLoopFramePoints(uint32_t start,uint32_t end)=0;
+		virtual void SetLoopTimePoints(float tStart,float tEnd)=0;
 		// GetSources() ?
 
-		std::string GetName() const;
-		bool IsInUse() const;
+		virtual std::string GetName() const=0;
+		virtual bool IsInUse() const=0;
 	private:
 		friend SoundSystem;
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	public:
-		alure::Buffer *GetALBuffer();
-	private:
-		SoundBuffer(alure::Context &context,alure::Buffer *buffer,const std::string &path="");
-		alure::Buffer *m_buffer = nullptr;
-		alure::Context &m_context;
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	public:
-		SoundBuffer(FMOD::System &system,const std::shared_ptr<FMOD::Sound> &sound);
-
-		const FMOD::Sound *GetFMODSound() const;
-		FMOD::Sound *GetFMODSound();
-	private:
-		FMOD::System &m_fmSystem;
-		std::shared_ptr<FMOD::Sound> m_fmSound = nullptr;
-#endif
 	};
-	class SoundBuffer;
-	using PSoundBuffer = std::shared_ptr<SoundBuffer>;
+	class ISoundBuffer;
+	using PSoundBuffer = std::shared_ptr<ISoundBuffer>;
 
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	class DLLALSYS Decoder
-		: public SoundBuffer
+		: public ISoundBuffer
 	{
 	public:
-		using SoundBuffer::SoundBuffer;
+		using ISoundBuffer::ISoundBuffer;
 	};
 #endif
 };

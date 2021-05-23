@@ -3,9 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "impl_alsound_buffer_base.hpp"
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-#include <AL/alure2.h>
-#endif
 
 #pragma optimize("",off)
 al::impl::BufferLoadData::BufferLoadData(SoundSystem &sys)
@@ -15,6 +12,7 @@ al::impl::BufferBase::BufferBase::BufferBase(const std::string &path)
 	: m_filePath(path)
 {}
 
+#if 0
 std::string al::impl::BufferBase::GetChannelConfigName() const
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
@@ -33,6 +31,7 @@ std::string al::impl::BufferBase::GetSampleTypeName() const
 	return "";
 #endif
 }
+#endif
 std::string al::impl::BufferBase::GetFilePath() const {return m_filePath;}
 
 void al::impl::BufferBase::SetTargetChannelConfig(ChannelConfig config) {m_targetChannelConfig = std::make_unique<ChannelConfig>(config);}

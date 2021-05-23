@@ -7,39 +7,14 @@
 #include "steam_audio/alsound_steam_audio.hpp"
 #include "alsound_binary_decoder.hpp"
 #include "alsound_coordinate_system.hpp"
+#include "alsound_effect.hpp"
+#include "alsound_listener.hpp"
+#include "alsound_source.hpp"
 #include <sstream>
 #include <fsys/filesystem.h>
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-#include <AL/alure2.h>
-#include <alext.h>
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-#include <fmod_studio.hpp>
-#include <fmod_errors.h>
-#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-#include "steam_audio/fmod/steam_audio_effects.hpp"
-#endif
-#endif
-
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-void al::fmod::check_result(uint32_t r)
-{
-	if(r != FMOD_OK)
-	{
-		std::cout<<"[FMOD] Error: "<<std::string(FMOD_ErrorString(static_cast<FMOD_RESULT>(r)))<<std::endl;
-		// throw std::runtime_error("FMOD error: " +std::string(FMOD_ErrorString(static_cast<FMOD_RESULT>(r))));
-	}
-}
-#endif
 
 namespace al
 {
-	class DLLALSYS DefaultSoundSourceFactory
-		: public SoundSourceFactory
-	{
-	public:
-		virtual SoundSource *CreateSoundSource(SoundSystem &system,SoundBuffer &buffer,InternalSource *source) override {return new SoundSource(system,buffer,source);};
-		virtual SoundSource *CreateSoundSource(SoundSystem &system,Decoder &decoder,InternalSource *source) override {return new SoundSource(system,decoder,source);};
-	};
 #ifdef _DEBUG
 	class MessageHandler
 		: public alure::MessageHandler
@@ -284,130 +259,20 @@ static bool apply_steam_audio_processing(ipl::Scene &scene,al::impl::BufferLoadD
 #endif
 #endif
 
-std::shared_ptr<al::SoundSystem> al::SoundSystem::Create(const std::string &deviceName,float metersPerUnit)
+al::ISoundSystem::ISoundSystem(float metersPerUnit)
+	: m_metersPerUnit{metersPerUnit}
 {
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	auto &devMgr = alure::DeviceManager::get();
-	auto *dev = devMgr.openPlayback();
-	if(dev == nullptr)
-		return nullptr;
-	auto *context = dev->createContext();
-	if(context == nullptr)
-	{
-		dev->close();
-		return nullptr;
-	}
-	alure::FileIOFactory::set(std::make_unique<al::FileFactory>());
-
-	alure::Context::MakeCurrent(context);
-#ifdef _DEBUG
-	context->setMessageHandler(std::make_shared<MessageHandler>());
-#endif
-
-	context->setBufferDataCallback([](uint8_t *inputData,std::vector<uint8_t> &outputData,int32_t &format,alure::ChannelConfig &channel,uint32_t &frequency,uint32_t dataLen,uint32_t fragmentSize,const std::shared_ptr<void> &userData) -> bool {
-		if(userData == nullptr)
-			return false;
-		auto &loadData = *static_cast<impl::BufferLoadData*>(userData.get());
-#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-		if(channel == alure::ChannelConfig::Mono && loadData.soundSystem.m_iplScene != nullptr)
-			return apply_steam_audio_processing(*loadData.soundSystem.m_iplScene,loadData,inputData,outputData,format,channel,frequency,dataLen);
-#endif
-		if(channel != alure::ChannelConfig::Stereo || (loadData.flags &impl::BufferLoadData::Flags::ConvertToMono) == impl::BufferLoadData::Flags::None)
-			return false;
-		switch(format)
-		{
-			case AL_STEREO8_SOFT:
-				stereo_to_mono<int8_t,int16_t>(reinterpret_cast<int8_t*>(inputData),outputData,dataLen);
-				format = AL_MONO8_SOFT;
-				break;
-			case AL_STEREO16_SOFT:
-				stereo_to_mono<int16_t,int32_t>(reinterpret_cast<int16_t*>(inputData),outputData,dataLen);
-				format = AL_MONO16_SOFT;
-				break;
-			case AL_STEREO32F_SOFT:
-				stereo_to_mono<float,double>(reinterpret_cast<float*>(inputData),outputData,dataLen);
-				format = AL_MONO32F_SOFT;
-				break;
-			default:
-				return false;
-		}
-		channel = static_cast<alure::ChannelConfig>(ChannelConfig::Mono);
-#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-		apply_steam_audio_processing(*loadData.soundSystem.m_iplScene,loadData,outputData.data(),outputData,format,channel,frequency,outputData.size());
-#endif
-		return true;
+	SetSoundSourceFactory([](const PSoundChannel &channel) -> PSoundSource {
+		return std::make_shared<al::SoundSource>(channel);
 	});
-
-	auto r = std::shared_ptr<SoundSystem>(new SoundSystem(dev,context,metersPerUnit));
-	return r;
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	FMOD::Studio::System *system = nullptr;
-	al::fmod::check_result(FMOD::Studio::System::create(&system));
-	auto ptrSystem = std::shared_ptr<FMOD::Studio::System>(system,[](FMOD::Studio::System *system) {
-		al::fmod::check_result(system->release());
-	});
-
-	FMOD::System *lowLevelSystem = nullptr;
-	al::fmod::check_result(system->getLowLevelSystem(&lowLevelSystem));
-	al::fmod::check_result(lowLevelSystem->setSoftwareFormat(0,FMOD_SPEAKERMODE_5POINT1,0));
-
-	void *extraDriverData = nullptr;
-	al::fmod::check_result(system->initialize(1'024,FMOD_STUDIO_INIT_NORMAL,FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED | FMOD_INIT_VOL0_BECOMES_VIRTUAL,extraDriverData));
-	al::fmod::check_result(lowLevelSystem->setFileSystem(
-		[](const char *name,uint32_t *fileSize,void **handle,void *userData) -> FMOD_RESULT {
-			auto f = FileManager::OpenFile(name,"rb");
-			if(f == nullptr)
-				return FMOD_RESULT::FMOD_ERR_FILE_NOTFOUND;
-			*fileSize = f->GetSize();
-			*handle = new VFilePtr(f);
-			return FMOD_RESULT::FMOD_OK;
-		},[](void *handle,void *userData) -> FMOD_RESULT {
-			delete static_cast<VFilePtr*>(handle);
-			return FMOD_RESULT::FMOD_OK;
-		},[](void *handle,void *buffer,uint32_t sizeBytes,uint32_t *bytesRead,void *userData) -> FMOD_RESULT {
-			*bytesRead = (*static_cast<VFilePtr*>(handle))->Read(buffer,sizeBytes);
-			if((*static_cast<VFilePtr*>(handle))->Eof())
-				return FMOD_RESULT::FMOD_ERR_FILE_EOF;
-			return FMOD_RESULT::FMOD_OK;
-		},[](void *handle,uint32_t pos,void *userData) -> FMOD_RESULT {
-			(*static_cast<VFilePtr*>(handle))->Seek(pos);
-			return FMOD_RESULT::FMOD_OK;
-		},nullptr,nullptr,-1
-	));
-	return std::shared_ptr<SoundSystem>(new SoundSystem(ptrSystem,*lowLevelSystem,metersPerUnit));
-#endif
 }
 
-std::shared_ptr<al::SoundSystem> al::SoundSystem::Create(float metersPerUnit) {return Create("",metersPerUnit);}
-
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-al::SoundSystem::SoundSystem(alure::Device *device,alure::Context *context,float metersPerUnit)
-	: m_device(device),m_context(context),m_listener(*context->getListener())
+al::ISoundSystem::~ISoundSystem()
 {
-	m_listener.SetMetersPerUnit(metersPerUnit);
-	SetSpeedOfSound(340.29f /metersPerUnit);
-	SetSoundSourceFactory(std::make_unique<al::DefaultSoundSourceFactory>());
+	OnRelease();
 }
-const alure::Device *al::SoundSystem::GetALDevice() const {return const_cast<SoundSystem*>(this)->GetALDevice();}
-alure::Device *al::SoundSystem::GetALDevice() {return m_device;}
-const alure::Context *al::SoundSystem::GetALContext() const {return const_cast<SoundSystem*>(this)->GetALContext();}
-alure::Context *al::SoundSystem::GetALContext() {return m_context;}
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-const FMOD::Studio::System &al::SoundSystem::GetFMODSystem() const {return const_cast<SoundSystem*>(this)->GetFMODSystem();}
-FMOD::Studio::System &al::SoundSystem::GetFMODSystem() {return *m_fmSystem;}
-const FMOD::System &al::SoundSystem::GetFMODLowLevelSystem() const {return const_cast<SoundSystem*>(this)->GetFMODLowLevelSystem();}
-FMOD::System &al::SoundSystem::GetFMODLowLevelSystem() {return m_fmLowLevelSystem;}
-al::SoundSystem::SoundSystem(const std::shared_ptr<FMOD::Studio::System> &fmSystem,FMOD::System &lowLevelSystem,float metersPerUnit)
-	: m_fmSystem(fmSystem),m_fmLowLevelSystem(lowLevelSystem),m_listener(*this)
-{
-	lowLevelSystem.set3DSettings(1.f,1.f,1.f);
-	// FMOD TODO
-	//SetSpeedOfSound(340.29f /metersPerUnit);
-	SetSoundSourceFactory(std::make_unique<al::DefaultSoundSourceFactory>());
-}
-#endif
 
-al::SoundSystem::~SoundSystem()
+void al::ISoundSystem::OnRelease()
 {
 	m_sources.clear();
 	m_effectSlots.clear();
@@ -419,133 +284,25 @@ al::SoundSystem::~SoundSystem()
 	m_effects.clear();
 	m_buffers.clear();
 	
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	alure::Context::MakeCurrent(nullptr);
-	try
-	{
-		m_context->destroy();
-	}
-	catch(const std::exception &e)
-	{
-		std::cout<<"WARNING: Unable to destroy sound context: "<<e.what()<<std::endl;
-	}
-	try
-	{
-		m_device->close();
-	}
-	catch(const std::exception &e)
-	{
-		std::cout<<"WARNING: Unable to close sound device: "<<e.what()<<std::endl;
-	}
-#endif
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 	ClearSteamAudioScene();
 #endif
 }
 
-void al::SoundSystem::SetSoundSourceFactory(std::unique_ptr<SoundSourceFactory> factory)
+void al::ISoundSystem::Initialize()
 {
-	if(factory == nullptr)
-		factory = std::make_unique<DefaultSoundSourceFactory>();
-	std::swap(m_soundSourceFactory,factory);
+	SetSpeedOfSound(340.29f /m_metersPerUnit);
+	m_listener = CreateListener();
+	m_listener->SetMetersPerUnit(m_metersPerUnit);
+	assert(m_listener);
 }
 
-uint32_t al::SoundSystem::GetMaxAuxiliaryEffectsPerSource() const
+void al::ISoundSystem::SetSoundSourceFactory(const SoundSourceFactory &factory)
 {
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_device->getMaxAuxiliarySends();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return 0u; // FMOD TODO
-#endif
+	m_soundSourceFactory = factory;
 }
 
-bool al::SoundSystem::IsSupported(ChannelConfig channels,SampleType type) const
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_context->isSupported(static_cast<alure::ChannelConfig>(channels),static_cast<alure::SampleType>(type));
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return true; // FMOD TODO
-#endif
-}
-
-float al::SoundSystem::GetDopplerFactor() const {return m_dopplerFactor;}
-void al::SoundSystem::SetDopplerFactor(float factor)
-{
-	m_dopplerFactor = factor;
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_context->setDopplerFactor(m_dopplerFactor);
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-#endif
-}
-
-float al::SoundSystem::GetSpeedOfSound() const {return m_speedOfSound;}
-void al::SoundSystem::SetSpeedOfSound(float speed)
-{
-	m_speedOfSound = speed;
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_context->setSpeedOfSound(m_speedOfSound);
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-#endif
-}
-
-al::DistanceModel al::SoundSystem::GetDistanceModel() const {return m_distanceModel;}
-void al::SoundSystem::SetDistanceModel(DistanceModel mdl)
-{
-	m_distanceModel = mdl;
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_context->setDistanceModel(static_cast<alure::DistanceModel>(m_distanceModel));
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-#endif
-}
-
-std::string al::SoundSystem::GetDeviceName() const
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_device->getName();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return "";// FMOD TODO
-#endif
-}
-void al::SoundSystem::PauseDeviceDSP()
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_device->pauseDSP();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-#endif
-}
-void al::SoundSystem::ResumeDeviceDSP()
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_device->resumeDSP();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-#endif
-}
-
-al::AuxiliaryEffectSlot *al::SoundSystem::CreateAuxiliaryEffectSlot()
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	alure::AuxiliaryEffectSlot *effectSlot = nullptr;
-	try
-	{
-		effectSlot = m_context->createAuxiliaryEffectSlot();
-	}
-	catch(const std::runtime_error &err)
-	{}
-	if(effectSlot == nullptr)
-		return nullptr;
-	auto r = std::shared_ptr<AuxiliaryEffectSlot>(new AuxiliaryEffectSlot(effectSlot));
-	m_effectSlots.push_back(r);
-	return r.get();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return nullptr; // FMOD TODO
-#endif
-}
-void al::SoundSystem::FreeAuxiliaryEffectSlot(AuxiliaryEffectSlot *slot)
+void al::ISoundSystem::FreeAuxiliaryEffectSlot(IAuxiliaryEffectSlot *slot)
 {
 	auto it = std::find_if(m_effectSlots.begin(),m_effectSlots.end(),[slot](const PAuxiliaryEffectSlot &slotOther) {
 		return (slotOther.get() == slot) ? true : false;
@@ -555,7 +312,7 @@ void al::SoundSystem::FreeAuxiliaryEffectSlot(AuxiliaryEffectSlot *slot)
 	m_effectSlots.erase(it);
 }
 
-void al::SoundSystem::Update()
+void al::ISoundSystem::Update()
 {
 	for(auto it=m_sources.begin();it!=m_sources.end();)
 	{
@@ -568,38 +325,17 @@ void al::SoundSystem::Update()
 			++it;
 		}
 	}
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	m_context->update();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	al::fmod::check_result(m_fmSystem->update());
-#endif
 }
 
-al::PEffect al::SoundSystem::CreateEffect()
+al::PSoundSource al::ISoundSystem::InitializeSource(const std::shared_ptr<ISoundChannel> &channel)
 {
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	alure::Effect *effect = nullptr;
-	try
-	{
-		effect = m_context->createEffect();
-	}
-	catch(const std::runtime_error &err)
-	{}
-	if(effect == nullptr)
+	if(channel == nullptr)
 		return nullptr;
-	return std::shared_ptr<Effect>(new Effect(*this,effect));
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return nullptr; // FMOD TODO
-#endif
-}
-
-al::PSoundSource al::SoundSystem::InitializeSource(SoundSource *source)
-{
-	if(source == nullptr)
+	auto psource = m_soundSourceFactory ? m_soundSourceFactory(channel) : nullptr;
+	if(!psource)
 		return nullptr;
-	auto psource = PSoundSource(source);
 	m_sources.push_back(psource);
-	ApplyGlobalEffects(*source);
+	ApplyGlobalEffects(*psource);
 
 	//auto *decoder = source->GetDecoder();
 	//auto *alDecoder = (decoder != nullptr) ? dynamic_cast<impl::DynamicDecoder*>(decoder->GetALDecoder().get()) : nullptr;
@@ -608,7 +344,7 @@ al::PSoundSource al::SoundSystem::InitializeSource(SoundSource *source)
 
 	return psource;
 }
-al::PSoundSource al::SoundSystem::CreateSource(const std::string &name,bool bStereo,Type type)
+al::PSoundSource al::ISoundSystem::CreateSource(const std::string &name,bool bStereo,Type type)
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
@@ -681,76 +417,30 @@ al::PSoundSource al::SoundSystem::CreateSource(const std::string &name,bool bSte
 	return nullptr; // FMOD TODO
 #endif
 }
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-al::PSoundSource al::SoundSystem::CreateSource(Decoder &decoder)
+const std::vector<al::PSoundSource> &al::ISoundSystem::GetSources() const {return const_cast<ISoundSystem*>(this)->GetSources();}
+std::vector<al::PSoundSource> &al::ISoundSystem::GetSources() {return m_sources;}
+
+al::PSoundSource al::ISoundSystem::CreateSource(ISoundBuffer &buffer)
 {
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	alure::Source *src = nullptr;
-	try {src = m_context->createSource();}
-	catch(const std::runtime_error &err) {}
-	if(src == nullptr)
+	auto channel = CreateChannel(buffer);
+	if(!channel)
 		return nullptr;
-	auto *snd = m_soundSourceFactory->CreateSoundSource(*this,decoder,src);
-	auto r = InitializeSource(snd);
-	if(r == nullptr)
-		return r;
-	auto userData = decoder.GetALDecoder()->userData;
-	if(userData != nullptr)
-	{
-		auto &loadData = *static_cast<impl::BufferLoadData*>(userData.get());
-		if((loadData.flags &impl::BufferLoadData::Flags::SingleSourceDecoder) != impl::BufferLoadData::Flags::None)
-			loadData.userData = std::make_shared<al::SoundSourceHandle>(r->GetHandle());
-	}
-	return r;
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return nullptr; // FMOD TODO
-#endif
+	return InitializeSource(channel);
 }
-#endif
-
-al::PSoundSource al::SoundSystem::CreateSource(SoundBuffer &buffer)
+al::PSoundSource al::ISoundSystem::CreateSource(Decoder &decoder)
 {
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-#if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-	if(IsSteamAudioEnabled() && buffer.GetTargetChannelConfig() == al::ChannelConfig::Mono)
-	{
-		// Redirect to steam audio decoder (Can't use buffers with steam audio)
-		auto r = CreateSource(buffer.GetFilePath(),false,Type::Buffer);
-		if(r != nullptr)
-			return r;
-	}
-#endif
-	alure::Source *src = nullptr;
-	try {src = m_context->createSource();}
-	catch(const std::runtime_error &err) {}
-	if(src == nullptr)
+	auto channel = CreateChannel(decoder);
+	if(!channel)
 		return nullptr;
-	auto *snd = m_soundSourceFactory->CreateSoundSource(*this,buffer,src);
-	return InitializeSource(snd);
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	FMOD::Channel *channel;
-	al::fmod::check_result(m_fmLowLevelSystem.playSound(buffer.GetFMODSound(),nullptr,true,&channel));
-	auto *snd = m_soundSourceFactory->CreateSoundSource(*this,buffer,channel);
-	if(snd == nullptr)
-		return nullptr;
-	FMOD_MODE mode;
-	al::fmod::check_result(channel->getMode(&mode));
-	mode &= ~(FMOD_3D_HEADRELATIVE | FMOD_3D_WORLDRELATIVE | FMOD_3D | FMOD_2D);
-	mode |= FMOD_3D_WORLDRELATIVE | FMOD_3D;
-
-	channel->setMode(mode);
-	return InitializeSource(snd);
-#endif
+	return InitializeSource(channel);
 }
-const std::vector<al::PSoundSource> &al::SoundSystem::GetSources() const {return const_cast<SoundSystem*>(this)->GetSources();}
-std::vector<al::PSoundSource> &al::SoundSystem::GetSources() {return m_sources;}
 
-uint32_t al::SoundSystem::GetAudioFrameSampleCount() const {return m_audioFrameSampleCount;}
-void al::SoundSystem::SetAudioFrameSampleCount(uint32_t size) {m_audioFrameSampleCount = size;}
+uint32_t al::ISoundSystem::GetAudioFrameSampleCount() const {return m_audioFrameSampleCount;}
+void al::ISoundSystem::SetAudioFrameSampleCount(uint32_t size) {m_audioFrameSampleCount = size;}
 
-std::vector<al::SoundBuffer*> al::SoundSystem::GetBuffers() const
+std::vector<al::ISoundBuffer*> al::ISoundSystem::GetBuffers() const
 {
-	std::vector<al::SoundBuffer*> buffers;
+	std::vector<al::ISoundBuffer*> buffers;
 	buffers.reserve(m_buffers.size() *2);
 	for(auto &pair : m_buffers)
 	{
@@ -762,90 +452,11 @@ std::vector<al::SoundBuffer*> al::SoundSystem::GetBuffers() const
 	return buffers;
 }
 
-void al::SoundSystem::StopSounds()
+void al::ISoundSystem::StopSounds()
 {
 	for(auto &hSrc : m_sources)
-		hSrc->Stop();
+		(*hSrc)->Stop();
 }
 
-const al::Listener &al::SoundSystem::GetListener() const {return const_cast<SoundSystem*>(this)->GetListener();}
-al::Listener &al::SoundSystem::GetListener() {return m_listener;}
-
-std::vector<std::string> al::SoundSystem::GetHRTFNames() const
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_device->enumerateHRTFNames();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return {}; // FMOD TODO
-#endif
-}
-
-std::string al::SoundSystem::GetCurrentHRTF() const
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_device->getCurrentHRTF();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return ""; // FMOD TODO
-#endif
-}
-bool al::SoundSystem::IsHRTFEnabled() const
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	return m_device->isHRTFEnabled();
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return false; // FMOD TODO
-#endif
-}
-
-void al::SoundSystem::SetHRTF(uint32_t id)
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	if(m_device->queryExtension("ALC_SOFT_HRTF") == false)
-		return;
-	m_device->reset({
-		{ALC_HRTF_SOFT,ALC_TRUE},
-		{ALC_HRTF_ID_SOFT,id},
-		{0,0}
-	});
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-#endif
-}
-void al::SoundSystem::DisableHRTF()
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	if(m_device->queryExtension("ALC_SOFT_HRTF") == false)
-		return;
-	m_device->reset({
-		{ALC_HRTF_SOFT,ALC_FALSE},
-		{0,0}
-	});
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-#endif
-}
-
-/////////////////////////////////
-
-std::vector<std::string> al::get_devices()
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	auto &devMgr = alure::DeviceManager::get();
-	return devMgr.enumerate(alure::DeviceEnumeration::Basic);
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-	return {};
-#endif
-}
-
-std::string al::get_default_device_name()
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	auto &devMgr = alure::DeviceManager::get();
-	return devMgr.defaultDeviceName(alure::DefaultDeviceType::Basic);
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-	return "";
-#endif
-}
-
+const al::IListener &al::ISoundSystem::GetListener() const {return const_cast<ISoundSystem*>(this)->GetListener();}
+al::IListener &al::ISoundSystem::GetListener() {return *m_listener;}

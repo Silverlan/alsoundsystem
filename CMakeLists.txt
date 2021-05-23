@@ -64,31 +64,14 @@ link_external_library(libogg)
 link_external_library(util_sound)
 link_external_library(steam_audio)
 
-# FMOD
-link_external_library(libsamplerate)
-
 add_include_dir(glm)
 
 add_external_library(libvorbisfile)
-
-set(CONFIG_UNDERLYING_LIBRARY "FMOD" CACHE STRING "Audio Library")
-set_property(CACHE CONFIG_UNDERLYING_LIBRARY PROPERTY STRINGS Alure FMOD)
 
 set(DEFINITIONS
 	ALSYS_DLL
 	GLM_FORCE_DEPTH_ZERO_TO_ONE
 )
-
-if(CONFIG_UNDERLYING_LIBRARY MATCHES "Alure")
-	list(APPEND DEFINITIONS ALSYS_LIBRARY_TYPE=0)
-	link_external_library(alure)
-	link_external_library(openal_soft)
-else()
-	list(APPEND DEFINITIONS ALSYS_LIBRARY_TYPE=1)
-	add_include_dir(fmod)
-	link_external_library(fmod)
-	link_external_library(fmod_studio)
-endif()
 
 ##### CONFIGURATION #####
 

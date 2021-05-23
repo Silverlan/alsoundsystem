@@ -6,19 +6,51 @@
 #define __ALSOUND_ENUMS_HPP__
 
 #include "alsound_definitions.hpp"
+#include <sharedutils/def_handle.h>
+#include <functional>
 #include <array>
 #include <mathutil/umath.h>
 
 namespace al
 {
-	enum class DLLALSYS ChannelType : uint32_t
+	struct EffectParams;
+	class SoundSource;
+	class Decoder;
+	class IEffect;
+	class SoundSystem;
+	class IListener;
+	class ISoundBuffer;
+	class ISoundChannel;
+	class IAuxiliaryEffectSlot;
+
+	using PEffect = std::shared_ptr<IEffect>;
+	using PSoundSource = std::shared_ptr<SoundSource>;
+	using PSoundChannel = std::shared_ptr<ISoundChannel>;
+	using PDecoder = std::shared_ptr<Decoder>;
+	using PAuxiliaryEffectSlot = std::shared_ptr<IAuxiliaryEffectSlot>;
+	using PSoundBuffer = std::shared_ptr<ISoundBuffer>;
+	
+	using SoundSourceFactory = std::function<PSoundSource(const PSoundChannel&)>;
+
+	DECLARE_BASE_HANDLE(DLLALSYS,IEffect,Effect);
+	DECLARE_BASE_HANDLE(DLLALSYS,SoundSource,SoundSource);
+
+	struct DLLALSYS EffectParams
+	{
+		EffectParams(float gain=1.f,float gainHF=1.f,float gainLF=1.f);
+		float gain = 1.f;
+		float gainHF = 1.f; // For low-pass and band-pass filters
+		float gainLF = 1.f; // For high-pass and band-pass filters
+	};
+
+	enum class ChannelType : uint32_t
 	{
 		Mono = 0,
 		Stereo
 	};
 
 	// See alure2.h
-	enum class DLLALSYS ChannelConfig : uint32_t
+	enum class ChannelConfig : uint32_t
 	{
 		/** 1-channel mono sound. */
 		Mono,
@@ -40,7 +72,7 @@ namespace al
 		BFormat3D
 	};
 
-	enum class DLLALSYS SampleType : uint32_t
+	enum class SampleType : uint32_t
 	{
 		UInt8,
 		Int16,
@@ -48,7 +80,7 @@ namespace al
 		Mulaw
 	};
 
-	enum class DLLALSYS DistanceModel : uint32_t
+	enum class DistanceModel : uint32_t
 	{
 		InverseClamped  = 0xD002,
 		LinearClamped   = 0xD004,

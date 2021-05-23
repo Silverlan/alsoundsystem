@@ -7,29 +7,4 @@
 
 #include "alsound_definitions.hpp"
 
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-namespace alure
-{
-	class Source;
-};
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-namespace FMOD
-{
-	class Channel;
-};
-#endif
-
-namespace al
-{
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	using InternalSource = alure::Source;
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	using InternalSource = FMOD::Channel;
-	namespace fmod
-	{
-		DLLALSYS void check_result(uint32_t r);
-	};
-#endif
-};
-
 #endif

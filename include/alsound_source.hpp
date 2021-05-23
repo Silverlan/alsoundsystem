@@ -6,7 +6,7 @@
 #define __ALSOUND_SOURCE_HPP__
 
 #include "alsound_definitions.hpp"
-#include "alsound_enums.hpp"
+#include "alsound_types.hpp"
 #include "alsound_decoder.hpp"
 #include "alsound_effect.hpp"
 #include "alsound_settings.hpp"
@@ -28,15 +28,14 @@ namespace FMOD {class Channel; class ChannelGroup; class DSP;};
 #endif
 namespace al
 {
-	class SoundBuffer;
-	class SoundSourceFactory;
-	class SoundSystem;
-	class DLLALSYS SoundSource
+	class ISoundBuffer;
+	class ISoundSystem;
+	class DLLALSYS ISoundChannel
 		: virtual public CallbackHandler,
-		virtual public util::inheritable_enable_shared_from_this<SoundSource>
+		virtual public util::inheritable_enable_shared_from_this<ISoundChannel>
 	{
 	public:
-		virtual ~SoundSource();
+		virtual ~ISoundChannel();
 
 		enum class DSPEffectSlot : uint32_t
 		{
@@ -49,17 +48,14 @@ namespace al
 			Count
 		};
 
-		SoundSource(SoundSystem &system,SoundBuffer &buffer,InternalSource *source);
-		SoundSource(SoundSystem &system,Decoder &decoder,InternalSource *source);
-		const InternalSource *GetInternalSource() const;
-		InternalSource *GetInternalSource();
+		ISoundChannel(ISoundSystem &system,ISoundBuffer &buffer);
+		ISoundChannel(ISoundSystem &system,Decoder &decoder);
 		
-		const SoundBuffer *GetBuffer() const;
-		SoundBuffer *GetBuffer();
+		const ISoundBuffer *GetBuffer() const;
+		ISoundBuffer *GetBuffer();
 		const Decoder *GetDecoder() const;
 		Decoder *GetDecoder();
-		SoundSourceHandle GetHandle() const;
-		SoundSystem &GetSoundSystem() const;
+		ISoundSystem &GetSoundSystem() const;
 
 		uint32_t GetFrequency() const;
 		ChannelConfig GetChannelConfig() const;
@@ -70,25 +66,23 @@ namespace al
 
 		float GetDuration() const;
 		float GetInverseFrequency() const;
-		std::string GetChannelConfigName() const;
-		std::string GetSampleTypeName() const;
 		bool IsMono() const;
 		bool IsStereo() const;
 
-		void Play();
-		void Stop();
-		void Pause();
-		void Resume();
-		bool IsPlaying() const;
-		bool IsPaused() const;
+		virtual void Play()=0;
+		virtual void Stop()=0;
+		virtual void Pause()=0;
+		virtual void Resume()=0;
+		virtual bool IsPlaying() const=0;
+		virtual bool IsPaused() const=0;
 		bool IsStopped() const;
 
-		void SetPriority(uint32_t priority);
-		uint32_t GetPriority() const;
+		virtual void SetPriority(uint32_t priority)=0;
+		virtual uint32_t GetPriority() const=0;
 
 		uint64_t GetFrameLength() const;
-		void SetFrameOffset(uint64_t offset);
-		uint64_t GetFrameOffset(uint64_t *latency=nullptr) const;
+		virtual void SetFrameOffset(uint64_t offset)=0;
+		virtual uint64_t GetFrameOffset(uint64_t *latency=nullptr) const=0;
 
 		void SetOffset(float offset);
 		float GetOffset() const;
@@ -96,104 +90,104 @@ namespace al
 		void SetTimeOffset(float offset);
 		float GetTimeOffset() const;
 
-		void SetLooping(bool bLoop);
-		bool IsLooping() const;
+		virtual void SetLooping(bool bLoop)=0;
+		virtual bool IsLooping() const=0;
 
-		void SetPitch(float pitch);
-		float GetPitch() const;
+		virtual void SetPitch(float pitch)=0;
+		virtual float GetPitch() const=0;
 
-		void SetGain(float gain);
-		float GetGain() const;
+		virtual void SetGain(float gain)=0;
+		virtual float GetGain() const=0;
 
-		void SetGainRange(float minGain,float maxGain);
-		std::pair<float,float> GetGainRange() const;
+		virtual void SetGainRange(float minGain,float maxGain)=0;
+		virtual std::pair<float,float> GetGainRange() const=0;
 		void SetMinGain(float gain);
-		float GetMinGain() const;
+		virtual float GetMinGain() const=0;
 		void SetMaxGain(float gain);
-		float GetMaxGain() const;
+		virtual float GetMaxGain() const=0;
 
-		void SetDistanceRange(float refDist,float maxDist);
-		std::pair<float,float> GetDistanceRange() const;
+		virtual void SetDistanceRange(float refDist,float maxDist)=0;
+		virtual std::pair<float,float> GetDistanceRange() const=0;
 		void SetReferenceDistance(float dist);
 		float GetReferenceDistance() const;
 		void SetMaxDistance(float dist);
 		float GetMaxDistance() const;
 
-		void SetPosition(const Vector3 &pos);
-		Vector3 GetPosition() const;
+		virtual void SetPosition(const Vector3 &pos)=0;
+		virtual Vector3 GetPosition() const=0;
 
 		Vector3 GetWorldPosition() const;
 
-		void SetVelocity(const Vector3 &vel);
-		Vector3 GetVelocity() const;
+		virtual void SetVelocity(const Vector3 &vel)=0;
+		virtual Vector3 GetVelocity() const=0;
 
-		void SetDirection(const Vector3 &dir);
-		Vector3 GetDirection() const;
+		virtual void SetDirection(const Vector3 &dir)=0;
+		virtual Vector3 GetDirection() const=0;
 
-		void SetOrientation(const Vector3 &at,const Vector3 &up);
-		std::pair<Vector3,Vector3> GetOrientation() const;
+		virtual void SetOrientation(const Vector3 &at,const Vector3 &up)=0;
+		virtual std::pair<Vector3,Vector3> GetOrientation() const=0;
 
-		void SetConeAngles(float inner,float outer);
-		std::pair<float,float> GetConeAngles() const;
+		virtual void SetConeAngles(float inner,float outer)=0;
+		virtual std::pair<float,float> GetConeAngles() const=0;
 		void SetInnerConeAngle(float inner);
 		float GetInnerConeAngle() const;
 		void SetOuterConeAngle(float outer);
 		float GetOuterConeAngle() const;
 
-		void SetOuterConeGains(float gain,float gainHF=1.f);
+		virtual void SetOuterConeGains(float gain,float gainHF=1.f)=0;
 		void SetOuterConeGain(float gain);
 		void SetOuterConeGainHF(float gain);
-		std::pair<float,float> GetOuterConeGains() const;
-		float GetOuterConeGain() const;
-		float GetOuterConeGainHF() const;
+		virtual std::pair<float,float> GetOuterConeGains() const=0;
+		virtual float GetOuterConeGain() const=0;
+		virtual float GetOuterConeGainHF() const=0;
 
-		void SetRolloffFactors(float factor,float roomFactor=0.f);
+		virtual void SetRolloffFactors(float factor,float roomFactor=0.f)=0;
 		void SetRoomRolloffFactor(float roomFactor);
-		std::pair<float,float> GetRolloffFactors() const;
-		float GetRolloffFactor() const;
-		float GetRoomRolloffFactor() const;
+		virtual std::pair<float,float> GetRolloffFactors() const=0;
+		virtual float GetRolloffFactor() const=0;
+		virtual float GetRoomRolloffFactor() const=0;
 
-		void SetDopplerFactor(float factor);
-		float GetDopplerFactor() const;
+		virtual void SetDopplerFactor(float factor)=0;
+		virtual float GetDopplerFactor() const=0;
 
-		void SetRelative(bool bRelative);
-		bool IsRelative() const;
+		virtual void SetRelative(bool bRelative)=0;
+		virtual bool IsRelative() const=0;
 
-		void SetRadius(float radius);
-		float GetRadius() const;
+		virtual void SetRadius(float radius)=0;
+		virtual float GetRadius() const=0;
 
-		void SetStereoAngles(float leftAngle,float rightAngle);
-		std::pair<float,float> GetStereoAngles() const;
+		virtual void SetStereoAngles(float leftAngle,float rightAngle)=0;
+		virtual std::pair<float,float> GetStereoAngles() const=0;
 		void SetLeftStereoAngle(float ang);
 		float GetLeftStereoAngle() const;
 		void SetRightStereoAngle(float ang);
 		float GetRightStereoAngle() const;
 
-		void SetAirAbsorptionFactor(float factor);
-		float GetAirAbsorptionFactor() const;
+		virtual void SetAirAbsorptionFactor(float factor)=0;
+		virtual float GetAirAbsorptionFactor() const=0;
 
-		void SetGainAuto(bool directHF,bool send,bool sendHF);
-		std::tuple<bool,bool,bool> GetGainAuto() const;
-		bool GetDirectGainHFAuto() const;
-		bool GetSendGainAuto() const;
-		bool GetSendGainHFAuto() const;
+		virtual void SetGainAuto(bool directHF,bool send,bool sendHF)=0;
+		virtual std::tuple<bool,bool,bool> GetGainAuto() const=0;
+		virtual bool GetDirectGainHFAuto() const=0;
+		virtual bool GetSendGainAuto() const=0;
+		virtual bool GetSendGainHFAuto() const=0;
 
 		float GetMaxAudibleDistance() const;
 
-		void SetDirectFilter(const Effect::Params &params);
-		const Effect::Params &GetDirectFilter() const;
-		bool AddEffect(Effect &effect,const Effect::Params &params=Effect::Params());
-		bool AddEffect(Effect &effect,uint32_t &slotId,const Effect::Params &params=Effect::Params());
-		bool AddEffect(Effect &effect,float gain);
-		bool AddEffect(Effect &effect,uint32_t &slotId,float gain);
-		void RemoveEffect(Effect &effect);
+		virtual void SetDirectFilter(const EffectParams &params)=0;
+		const EffectParams &GetDirectFilter() const;
+		bool AddEffect(IEffect &effect,const EffectParams &params=EffectParams());
+		bool AddEffect(IEffect &effect,uint32_t &slotId,const EffectParams &params=EffectParams());
+		bool AddEffect(IEffect &effect,float gain);
+		bool AddEffect(IEffect &effect,uint32_t &slotId,float gain);
+		void RemoveEffect(IEffect &effect);
 		void RemoveEffect(uint32_t slotId);
 		void RemoveEffects();
-		void SetEffectParameters(Effect &effect,const Effect::Params &params);
-		void SetEffectParameters(uint32_t slotId,const Effect::Params &params);
-		void SetEffectGain(Effect &effect,float gain);
+		void SetEffectParameters(IEffect &effect,const EffectParams &params);
+		virtual void SetEffectParameters(uint32_t slotId,const EffectParams &params)=0;
+		void SetEffectGain(IEffect &effect,float gain);
 		void SetEffectGain(uint32_t slotId,float gain);
-		std::vector<Effect*> GetEffects();
+		std::vector<IEffect*> GetEffects();
 
 		virtual void Update();
 		virtual bool IsIdle() const; // If true is returned, and no references to the sound exist anymore, the sound will be released by the sound system
@@ -240,47 +234,19 @@ namespace al
 		mutable FMOD::ChannelGroup *m_channelGroup = nullptr;
 #endif
 #endif
-
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	public:
-		void SetFMOD3DAttributesEffective(bool b);
-	private:
-		struct SoundSourceData
-		{
-			uint64_t offset = 0ull;
-			uint32_t priority = 0u;
-			bool looping = false;
-			float pitch = 1.f;
-			float gain = 1.f;
-			float minGain = 0.f;
-			float maxGain = 1.f;
-			std::pair<float,float> distanceRange = {1.f,10'000.f};
-			Vector3 position = {};
-			Vector3 velocity = {};
-			std::pair<float,float> coneAngles = {360.f,360.f};
-			float dopplerFactor = 1.f;
-			bool relativeToListener = false;
-		};
-		void UpdateMode();
-		bool Is3D() const;
-		bool Is2D() const;
-		bool CheckResultAndUpdateValidity(uint32_t result) const;
-		void InvalidateSource() const;
-		void InitializeChannel();
-		SoundSourceData m_soundSourceData = {};
-#endif
-	private:
-		SoundSystem &m_system;
-		mutable InternalSource *m_source = nullptr;
+	protected:
+		virtual void DoAddEffect(AuxiliaryEffectSlot &slot,uint32_t slotId,const EffectParams &params)=0;
+		virtual void DoRemoveInternalEffect(uint32_t slotId)=0;
+		virtual void DoRemoveEffect(uint32_t slotId)=0;
+		ISoundSystem &m_system;
 		bool m_b3DAttributesEffective = true;
-		std::weak_ptr<SoundBuffer> m_buffer = {};
-		Effect::Params m_directFilter = {};
+		std::weak_ptr<ISoundBuffer> m_buffer = {};
+		EffectParams m_directFilter = {};
 		std::string m_identifier = {};
 		bool m_bReady = true;
 		bool m_bSchedulePlay = false;
-		std::vector<std::pair<std::shared_ptr<Effect>,uint32_t>> m_effects;
+		std::vector<std::pair<std::shared_ptr<IEffect>,uint32_t>> m_effects;
 		PDecoder m_decoder = nullptr;
-		mutable SoundSourceHandle m_handle = {};
 
 		uint32_t m_nextAuxSlot = 0;
 		std::queue<uint32_t> m_freeAuxEffectIds;
@@ -288,6 +254,27 @@ namespace al
 		virtual void OnReady();
 		impl::BufferBase *GetBaseBuffer() const;
 		void RemoveInternalEffect(decltype(m_effects)::iterator it);
+	};
+
+	class DLLALSYS SoundSource
+	{
+	public:
+		SoundSource(const std::shared_ptr<ISoundChannel> &channel);
+		virtual ~SoundSource();
+		SoundSourceHandle GetHandle() const;
+
+		virtual void Update() {return (*this)->Update();}
+		virtual bool IsIdle() const {return (*this)->IsIdle();}
+
+		ISoundChannel &GetChannel() {return *m_channel;}
+		const ISoundChannel &GetChannel() const {return const_cast<SoundSource*>(this)->GetChannel();}
+		ISoundChannel *operator->() {return &GetChannel();}
+		const ISoundChannel *operator->() const {return &GetChannel();}
+		ISoundChannel &operator*() {return GetChannel();}
+		const ISoundChannel &operator*() const {return GetChannel();}
+	private:
+		std::shared_ptr<ISoundChannel> m_channel = nullptr;
+		mutable SoundSourceHandle m_handle = {};
 	};
 	using PSoundSource = std::shared_ptr<SoundSource>;
 	using WPSoundSource = std::weak_ptr<SoundSource>;

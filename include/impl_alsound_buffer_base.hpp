@@ -6,7 +6,7 @@
 #define __IMPL_ALSOUND_BUFFER_BASE_HPP__
 
 #include "alsound_definitions.hpp"
-#include "alsound_enums.hpp"
+#include "alsound_types.hpp"
 #include <cinttypes>
 #include <memory>
 #include <string>
@@ -39,6 +39,7 @@ namespace al
 		class DLLALSYS BufferBase
 		{
 		public:
+			virtual ~BufferBase()=default;
 			virtual uint32_t GetFrequency() const=0;
 			virtual ChannelConfig GetChannelConfig() const=0;
 			virtual SampleType GetSampleType() const=0;
@@ -51,8 +52,6 @@ namespace al
 			std::pair<float,float> GetLoopTimePoints() const;
 			float GetDuration() const;
 			float GetInverseFrequency() const;
-			std::string GetChannelConfigName() const;
-			std::string GetSampleTypeName() const;
 			std::string GetFilePath() const;
 			bool IsMono() const;
 			bool IsStereo() const;

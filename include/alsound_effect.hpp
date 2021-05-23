@@ -6,7 +6,7 @@
 #define __ALSOUND_EFFECT_HPP__
 
 #include "alsound_definitions.hpp"
-#include "alsound_enums.hpp"
+#include "alsound_types.hpp"
 #include "impl_alsound_source_handle.hpp"
 #include <sharedutils/def_handle.h>
 #include <memory>
@@ -23,7 +23,7 @@ namespace FMOD
 #endif
 namespace al
 {
-	enum class DLLALSYS VocalMorpherPhoneme : uint32_t
+	enum class VocalMorpherPhoneme : uint32_t
 	{
 		A = 0,
 		E,
@@ -57,7 +57,7 @@ namespace al
 		Z
 	};
 
-	enum class DLLALSYS Waveform : uint32_t
+	enum class Waveform : uint32_t
 	{
 		Sinusoid = 0,
 		Triangle,
@@ -186,72 +186,45 @@ namespace al
 		float flHighCutoff = 6'000.f;
 	};
 
-	class SoundSystem;
-	class SoundSource;
+	class ISoundSystem;
+	class ISoundChannel;
 	class AuxiliaryEffectSlot;
-	class Effect;
-	DECLARE_BASE_HANDLE(DLLALSYS,Effect,Effect);
-	class DLLALSYS Effect
-		: public std::enable_shared_from_this<Effect>
+	class DLLALSYS IEffect
+		: public std::enable_shared_from_this<IEffect>
 	{
 	public:
-		struct DLLALSYS Params
-		{
-			Params(float gain=1.f,float gainHF=1.f,float gainLF=1.f);
-			float gain = 1.f;
-			float gainHF = 1.f; // For low-pass and band-pass filters
-			float gainLF = 1.f; // For high-pass and band-pass filters
-		};
+		virtual ~IEffect();
 
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	public:
-		const alure::Effect &GetALEffect() const;
-		alure::Effect &GetALEffect();
-	private:
-		Effect(SoundSystem &soundSys,alure::Effect *effect);
-		alure::Effect *m_effect = nullptr;
-		AuxiliaryEffectSlot *m_slot = nullptr;
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	public:
-		const std::shared_ptr<FMOD::DSP> &GetFMODDsp() const;
-		std::shared_ptr<FMOD::DSP> &GetFMODDsp();
-	private:
-		Effect(SoundSystem &soundSys,const std::shared_ptr<FMOD::DSP> &dsp);
-		std::shared_ptr<FMOD::DSP> m_fmDsp = nullptr;
-#endif
-	public:
-		~Effect();
-
-		void SetProperties(al::EfxEaxReverbProperties props);
-		void SetProperties(al::EfxChorusProperties props);
-		void SetProperties(al::EfxDistortionProperties props);
-		void SetProperties(al::EfxEchoProperties props);
-		void SetProperties(al::EfxFlangerProperties props);
-		void SetProperties(al::EfxFrequencyShifterProperties props);
-		void SetProperties(al::EfxVocalMorpherProperties props);
-		void SetProperties(al::EfxPitchShifterProperties props);
-		void SetProperties(al::EfxRingModulatorProperties props);
-		void SetProperties(al::EfxAutoWahProperties props);
-		void SetProperties(al::EfxCompressor props);
-		void SetProperties(al::EfxEqualizer props);
+		virtual void SetProperties(al::EfxEaxReverbProperties props)=0;
+		virtual void SetProperties(al::EfxChorusProperties props)=0;
+		virtual void SetProperties(al::EfxDistortionProperties props)=0;
+		virtual void SetProperties(al::EfxEchoProperties props)=0;
+		virtual void SetProperties(al::EfxFlangerProperties props)=0;
+		virtual void SetProperties(al::EfxFrequencyShifterProperties props)=0;
+		virtual void SetProperties(al::EfxVocalMorpherProperties props)=0;
+		virtual void SetProperties(al::EfxPitchShifterProperties props)=0;
+		virtual void SetProperties(al::EfxRingModulatorProperties props)=0;
+		virtual void SetProperties(al::EfxAutoWahProperties props)=0;
+		virtual void SetProperties(al::EfxCompressor props)=0;
+		virtual void SetProperties(al::EfxEqualizer props)=0;
 
 		void Release();
 		EffectHandle GetHandle() const;
-	private:
-
-		SoundSystem &m_soundSystem;
+	protected:
+		IEffect(ISoundSystem &soundSys);
+		ISoundSystem &m_soundSystem;
 		EffectHandle m_handle = {};
 		std::vector<SoundSourceHandle> m_attachedSources;
 
 		// These should only be called by a SoundSource-instance!
-		AuxiliaryEffectSlot *AttachSource(SoundSource &source);
-		void DetachSource(SoundSource &source);
+		virtual AuxiliaryEffectSlot *AttachSource(ISoundChannel &source)=0;
+		virtual void DetachSource(ISoundChannel &source)=0;
 
-		friend SoundSource;
-		friend SoundSystem;
+		friend ISoundChannel;
+		friend ISoundSystem;
 	};
-	using PEffect = std::shared_ptr<Effect>;
-	using WPEffect = std::weak_ptr<Effect>;
+	using PEffect = std::shared_ptr<IEffect>;
+	using WPEffect = std::weak_ptr<IEffect>;
 };
 #pragma warning(pop)
 

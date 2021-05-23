@@ -10,7 +10,7 @@
 #include <fmod_studio.hpp>
 #endif
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-void al::SoundSystem::ClearSteamAudioScene()
+void al::ISoundSystem::ClearSteamAudioScene()
 {
 	for(auto &pSource : m_sources)
 	{
@@ -22,7 +22,7 @@ void al::SoundSystem::ClearSteamAudioScene()
 	m_iplContext = nullptr;
 }
 
-ipl::Scene *al::SoundSystem::InitializeSteamAudioScene()
+ipl::Scene *al::ISoundSystem::InitializeSteamAudioScene()
 {
 	m_iplContext = ipl::Context::Create(GetAudioFrameSampleCount());
 	if(m_iplContext == nullptr)
@@ -39,9 +39,9 @@ ipl::Scene *al::SoundSystem::InitializeSteamAudioScene()
 	m_iplScene = m_iplContext->CreateScene();
 	return m_iplScene.get();
 }
-ipl::Scene *al::SoundSystem::GetSteamAudioScene() {return m_iplScene.get();}
+ipl::Scene *al::ISoundSystem::GetSteamAudioScene() {return m_iplScene.get();}
 
-void al::SoundSystem::SetSteamAudioEnabled(bool b)
+void al::ISoundSystem::SetSteamAudioEnabled(bool b)
 {
 	m_bSteamAudioEnabled = b;
 	for(auto &pSource : m_sources)
@@ -54,11 +54,11 @@ void al::SoundSystem::SetSteamAudioEnabled(bool b)
 	if(b == false)
 		ClearSteamAudioScene();
 }
-bool al::SoundSystem::IsSteamAudioEnabled() const {return m_bSteamAudioEnabled;}
-const al::steam_audio::Properties &al::SoundSystem::GetSteamAudioProperties() const {return const_cast<SoundSystem*>(this)->GetSteamAudioProperties();}
-al::steam_audio::Properties &al::SoundSystem::GetSteamAudioProperties() {return m_steamAudioProperties;}
-void al::SoundSystem::SetSteamAudioSpatializerEnabled(bool b) {m_bSteamAudioSpatializerEnabled = b;}
-void al::SoundSystem::SetSteamAudioReverbEnabled(bool b) {m_bSteamAudioReverbEnabled = b;}
-util::Overridable<bool> &al::SoundSystem::GetSteamAudioSpatializerEnabled() {return m_bSteamAudioSpatializerEnabled;}
-util::Overridable<bool> &al::SoundSystem::GetSteamAudioReverbEnabled() {return m_bSteamAudioReverbEnabled;}
+bool al::ISoundSystem::IsSteamAudioEnabled() const {return m_bSteamAudioEnabled;}
+const al::steam_audio::Properties &al::ISoundSystem::GetSteamAudioProperties() const {return const_cast<ISoundSystem*>(this)->GetSteamAudioProperties();}
+al::steam_audio::Properties &al::ISoundSystem::GetSteamAudioProperties() {return m_steamAudioProperties;}
+void al::ISoundSystem::SetSteamAudioSpatializerEnabled(bool b) {m_bSteamAudioSpatializerEnabled = b;}
+void al::ISoundSystem::SetSteamAudioReverbEnabled(bool b) {m_bSteamAudioReverbEnabled = b;}
+util::Overridable<bool> &al::ISoundSystem::GetSteamAudioSpatializerEnabled() {return m_bSteamAudioSpatializerEnabled;}
+util::Overridable<bool> &al::ISoundSystem::GetSteamAudioReverbEnabled() {return m_bSteamAudioReverbEnabled;}
 #endif

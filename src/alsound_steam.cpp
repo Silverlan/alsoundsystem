@@ -6,14 +6,9 @@
 #include "steam_audio/alsound_steam_audio.hpp"
 #include "alsoundsystem.hpp"
 #include "alsound_coordinate_system.hpp"
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-#include <alure2.h>
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-#include <fmod_studio.hpp>
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #include "steam_audio/fmod/steam_audio_effects.hpp"
 #include <sharedutils/scope_guard.h>
-#endif
 #endif
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 void al::SoundSource::InitializeSteamAudio()

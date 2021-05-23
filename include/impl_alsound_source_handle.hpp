@@ -8,10 +8,4 @@
 #include "alsound_definitions.hpp"
 #include <sharedutils/def_handle.h>
 
-namespace al
-{
-	class SoundSource;
-	DECLARE_BASE_HANDLE(DLLALSYS,SoundSource,SoundSource);
-};
-
 #endif
