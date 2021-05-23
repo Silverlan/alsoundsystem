@@ -117,8 +117,6 @@ endforeach(LIB)
 
 target_include_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 target_include_directories(${PROJ_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
-target_include_directories(${PROJ_NAME} PRIVATE ${DEPENDENCY_ALURE_INCLUDE}/AL)
-target_include_directories(${PROJ_NAME} PRIVATE ${DEPENDENCY_ALURE_INCLUDE}/../src)
 
 foreach(INCLUDE_PATH IN LISTS INCLUDE_DIRS)
 	target_include_directories(${PROJ_NAME} PRIVATE ${${INCLUDE_PATH}})
