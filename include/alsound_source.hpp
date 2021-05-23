@@ -235,7 +235,7 @@ namespace al
 #endif
 #endif
 	protected:
-		virtual void DoAddEffect(AuxiliaryEffectSlot &slot,uint32_t slotId,const EffectParams &params)=0;
+		virtual void DoAddEffect(IAuxiliaryEffectSlot &slot,uint32_t slotId,const EffectParams &params)=0;
 		virtual void DoRemoveInternalEffect(uint32_t slotId)=0;
 		virtual void DoRemoveEffect(uint32_t slotId)=0;
 		ISoundSystem &m_system;

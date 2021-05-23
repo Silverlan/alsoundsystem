@@ -188,7 +188,6 @@ namespace al
 
 	class ISoundSystem;
 	class ISoundChannel;
-	class AuxiliaryEffectSlot;
 	class DLLALSYS IEffect
 		: public std::enable_shared_from_this<IEffect>
 	{
@@ -217,7 +216,7 @@ namespace al
 		std::vector<SoundSourceHandle> m_attachedSources;
 
 		// These should only be called by a SoundSource-instance!
-		virtual AuxiliaryEffectSlot *AttachSource(ISoundChannel &source)=0;
+		virtual IAuxiliaryEffectSlot *AttachSource(ISoundChannel &source)=0;
 		virtual void DetachSource(ISoundChannel &source)=0;
 
 		friend ISoundChannel;
