@@ -5,6 +5,3 @@
 #include "alsound_buffer.hpp"
 #include "alsoundsystem.hpp"
 #include "alsound_settings.hpp"
-
-#pragma optimize("",off)
-#pragma optimize("",on)
