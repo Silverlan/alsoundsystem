@@ -182,17 +182,6 @@ namespace al
 	DLLALSYS bool get_sound_duration(const std::string path,float &duration);
 };
 
-template<class TEfxProperties>
-	al::PEffect al::ISoundSystem::CreateEffect(const TEfxProperties &props)
-{
-	auto effect = CreateEffect();
-	if(effect == nullptr)
-		return nullptr;
-	effect->SetProperties(props);
-	m_effects.push_back(effect->GetHandle());
-	return effect;
-}
-
 #pragma warning(pop)
 
 #endif
