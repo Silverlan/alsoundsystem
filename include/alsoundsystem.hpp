@@ -93,6 +93,7 @@ namespace al
 		virtual uint32_t GetMaxAuxiliaryEffectsPerSource() const=0;
 
 		void SetSoundSourceFactory(const SoundSourceFactory &factory);
+		void SetOnReleaseSoundCallback(const std::function<void(const SoundSource&)> &onReleaseSoundCallback) {m_onReleaseSoundCallback = onReleaseSoundCallback;}
 
 		virtual void Update();
 
@@ -117,6 +118,9 @@ namespace al
 		util::Overridable<bool> m_bSteamAudioSpatializerEnabled = false;
 		util::Overridable<bool> m_bSteamAudioReverbEnabled = false;
 #endif
+
+		// Internal use only
+		void OnSoundRelease(const SoundSource &snd);
 	protected:
 		ISoundSystem(float metersPerUnit);
 		void Initialize();
@@ -158,6 +162,7 @@ namespace al
 		std::uint32_t m_nextGlobalEffectId = 0;
 		std::queue<uint32_t> m_freeGlobalEffectIds;
 		std::unordered_map<uint32_t,GlobalEffect> m_globalEffects;
+		std::function<void(const SoundSource&)> m_onReleaseSoundCallback = nullptr;
 		void RemoveGlobalEffect(GlobalEffect &globalEffect);
 		void SetGlobalEffectParameters(GlobalEffect &globalEffect,const EffectParams &params);
 		void ApplyGlobalEffect(SoundSource &source,GlobalEffect &globalEffect);

@@ -359,3 +359,5 @@ al::SoundSource::~SoundSource()
 	m_handle.Invalidate();
 }
 al::SoundSourceHandle al::SoundSource::GetHandle() const {return m_handle;}
+
+void al::SoundSource::OnRelease() {m_channel->GetSoundSystem().OnSoundRelease(*this);}

@@ -263,7 +263,10 @@ al::ISoundSystem::ISoundSystem(float metersPerUnit)
 	: m_metersPerUnit{metersPerUnit}
 {
 	SetSoundSourceFactory([](const PSoundChannel &channel) -> PSoundSource {
-		return std::make_shared<al::SoundSource>(channel);
+		return std::shared_ptr<al::SoundSource>{new al::SoundSource{channel},[](al::SoundSource *snd) {
+			snd->OnRelease();
+			delete snd;
+		}};
 	});
 }
 
@@ -287,6 +290,12 @@ void al::ISoundSystem::OnRelease()
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 	ClearSteamAudioScene();
 #endif
+}
+
+void al::ISoundSystem::OnSoundRelease(const SoundSource &snd)
+{
+	if(m_onReleaseSoundCallback)
+		m_onReleaseSoundCallback(snd);
 }
 
 void al::ISoundSystem::Initialize()

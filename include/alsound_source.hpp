@@ -265,6 +265,7 @@ namespace al
 
 		virtual void Update() {return (*this)->Update();}
 		virtual bool IsIdle() const {return (*this)->IsIdle();}
+		virtual void OnRelease();
 
 		ISoundChannel &GetChannel() {return *m_channel;}
 		const ISoundChannel &GetChannel() const {return const_cast<SoundSource*>(this)->GetChannel();}
