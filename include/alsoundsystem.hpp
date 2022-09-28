@@ -129,7 +129,7 @@ namespace al
 		virtual ISoundBuffer *DoLoadSound(const std::string &path,bool bConvertToMono=false,bool bAsync=true)=0;
 		PSoundSource InitializeSource(const std::shared_ptr<ISoundChannel> &channel);
 		virtual std::unique_ptr<IListener> CreateListener()=0;
-		std::unique_ptr<IListener> m_listener = nullptr;
+        std::unique_ptr<IListener> m_listener;
 		std::vector<PSoundSource> m_sources;
 
 		struct BufferCache
