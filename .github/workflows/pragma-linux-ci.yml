@@ -41,7 +41,7 @@ jobs:
           
       - name: Build
         id: build
-        uses: Silverlan/tmp_alsoundsystem_ci/github_actions/build@master
+        uses: Silverlan/alsoundsystem/github_actions/build@master
         with:
           repo-directory: '.'
 
