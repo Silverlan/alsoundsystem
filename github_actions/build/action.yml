@@ -1,47 +1,53 @@
 name: Build
 description: 'Build library'
 inputs:
-  root_dir:
-    description: 'Root directory'
+  repo-directory:
+    description: 'Specifies source code location. If empty, source code will be downloaded to working-directory.'
     required: true
-  should_checkout:
-    description: 'Checkout the core library?'
+    default: ''
+  working-directory:
+    description: 'Working Directory'
     required: true
-    default: '1'
-  dir:
-    description: 'Library directory'
-    required: true
-    default: 'external_libs/alsoundsystem'
+    default: '.'
 runs:
   using: "composite"
   steps:
+    - uses: Silverlan/common_actions/action_start@main
+      with:
+        name: "alsoundsystem > build"
+        input_values: "repo-directory: ${{inputs.repo-directory}},working-directory: ${{inputs.working-directory}}"
+  
     - name: Initialize Env
       id: init-env
       uses: Silverlan/common_actions/set_common_env_vars@main
+      with:
+        working-directory: ${{inputs.working-directory}}
       
     - uses: ChristopherHX/conditional@b4a9649204f81002ec9a4ef7d4bf7d6b2ab7fa55
       name: CMake Build
       with:
-        if: ${{inputs.should_checkout == '1'}}
+        if: ${{inputs.repo-directory == ''}}
         step: |
-          uses: Silverlan/common_actions/get_submodule@main
+          uses: Silverlan/common_actions/get_submodule_simple@main
           with:
             repo: 'Silverlan/alsoundsystem'
-            repo_name: 'alsoundsystem'
             cmake_var: 'DEPENDENCY_ALSOUNDSYSTEM_INCLUDE'
-            dir: 'external_libs'
-            include_dir: 'alsoundsystem/include'
+            working-directory: ${{inputs.working-directory}}
             
     - name: Define ALSoundSystem CMake variables
       uses: Silverlan/common_actions/define_cmake_var@main
       with:
         cmake_var: ' -DDEPENDENCY_ALSOUNDSYSTEM_INCLUDE=${{ env.GA_ROOT_DIR }}/external_libs/alsoundsystem/include'
+        working-directory: ${{inputs.working-directory}}
 
     - name: Download GLM
       uses: Silverlan/common_actions/get_glm@main
+      with:
+        working-directory: ${{inputs.working-directory}}
             
     - name: Download vfilesystem Binaries
       shell: bash
+      working-directory: ${{inputs.working-directory}}
       run: |
         wget https://github.com/Silverlan/vfilesystem/releases/download/latest/binaries_linux64.tar.gz
         tar xvfz binaries_linux64.tar.gz
@@ -49,6 +55,7 @@ runs:
             
     - name: Download sharedutils Source Code
       shell: bash
+      working-directory: ${{inputs.working-directory}}
       run: |
         wget https://github.com/Silverlan/sharedutils/archive/refs/tags/latest.tar.gz
         tar xvfz latest.tar.gz
@@ -56,6 +63,7 @@ runs:
             
     - name: Download mathutil Source Code
       shell: bash
+      working-directory: ${{inputs.working-directory}}
       run: |
         wget https://github.com/Silverlan/mathutil/archive/refs/tags/latest.tar.gz
         tar xvfz latest.tar.gz
@@ -63,6 +71,7 @@ runs:
             
     - name: Download vfilesystem Source Code
       shell: bash
+      working-directory: ${{inputs.working-directory}}
       run: |
         wget https://github.com/Silverlan/vfilesystem/archive/refs/tags/latest.tar.gz
         tar xvfz latest.tar.gz
@@ -70,6 +79,7 @@ runs:
             
     - name: Build ogg
       shell: bash
+      working-directory: ${{inputs.working-directory}}
       run: |
         git clone --recurse-submodules https://github.com/xiph/ogg.git
         cd ogg
@@ -80,6 +90,7 @@ runs:
             
     - name: Build vorbis
       shell: bash
+      working-directory: ${{inputs.working-directory}}
       run: |
         git clone --recurse-submodules https://github.com/xiph/vorbis.git
         cd vorbis
@@ -89,6 +100,7 @@ runs:
             
     - name: Build util_sound
       shell: bash
+      working-directory: ${{inputs.working-directory}}
       run: |
         git clone --recurse-submodules https://github.com/Silverlan/util_sound.git
         cd util_sound
@@ -107,6 +119,7 @@ runs:
             
     - name: Build
       shell: bash
+      working-directory: ${{inputs.working-directory}}
       run: |
         cmake -G "Unix Makefiles" \
         -DDEPENDENCY_SHAREDUTILS_INCLUDE="sharedutils-latest/include/" \
@@ -116,3 +129,5 @@ runs:
         -DDEPENDENCY_GLM_INCLUDE="third_party_libs/glm/"
         cmake --build ./ --verbose --target alsoundsystem
             
+    - uses: Silverlan/common_actions/action_end@main
+    

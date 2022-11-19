@@ -1,4 +1,4 @@
-name: Build Linux
+name: Build Windows
 on:
   push:
     branches: [ master ]
@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 
 concurrency:
-  group: environment-lin-${{ github.ref }}
+  group: environment-win-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -17,14 +17,15 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - os: ubuntu-22.04
-            name: "Ubuntu GCC-11"
-            artifact: "ubuntu_gcc.7z"
+          - os: windows-latest
+            name: "Windows x64 MSVC"
+            artifact: "Windows-MSVC.tar.xz"
             build_type: "RelWithDebInfo"
-            cc: "clang-14"
-            cxx: "clang++-14"
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+            cc: "cl"
+            cxx: "cl"
             archiver: "7z a"
-            generators: "Unix Makefiles"
+            generators: "Visual Studio 17 2022"
             build_dir: 'build'
     steps:
       - uses: actions/checkout@v2
