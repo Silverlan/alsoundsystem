@@ -9,7 +9,7 @@
 #include "alsound_effect.hpp"
 
 template<class TEfxProperties>
-	al::PEffect al::ISoundSystem::CreateEffect(const TEfxProperties &props)
+al::PEffect al::ISoundSystem::CreateEffect(const TEfxProperties &props)
 {
 	auto effect = CreateEffect();
 	if(effect == nullptr)

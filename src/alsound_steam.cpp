@@ -13,13 +13,13 @@
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 void al::SoundSource::InitializeSteamAudio()
 {
-	m_bSteamAudioSpatializerEnabled.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	m_bSteamAudioSpatializerEnabled.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(newVal.get() == false)
 			ClearSteamAudioSpatializerDSP();
 		else
 			UpdateSteamAudioDSPEffects();
 	});
-	m_bSteamAudioReverbEnabled.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	m_bSteamAudioReverbEnabled.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(newVal.get() == false)
 			ClearSteamAudioReverbDSP();
 		else
@@ -38,10 +38,10 @@ bool al::SoundSource::InitializeConvolutionEffect(const std::string &name)
 	auto &userData = m_decoder->GetALDecoder()->userData;
 	if(userData == nullptr)
 		return false;
-	auto &bufferLoadData = *static_cast<impl::BufferLoadData*>(userData.get());
-	if((bufferLoadData.flags &impl::BufferLoadData::Flags::SingleSourceDecoder) == impl::BufferLoadData::Flags::None)
+	auto &bufferLoadData = *static_cast<impl::BufferLoadData *>(userData.get());
+	if((bufferLoadData.flags & impl::BufferLoadData::Flags::SingleSourceDecoder) == impl::BufferLoadData::Flags::None)
 		return false;
-	auto err = iplCreateConvolutionEffect(iplScene->GetIplRenderer(),const_cast<char*>(name.c_str()),IPLSimulationType::IPL_SIMTYPE_REALTIME,iplScene->GetIplInputFormat(),iplScene->GetIplOutputFormat(),&m_iplConvolutionEffect);
+	auto err = iplCreateConvolutionEffect(iplScene->GetIplRenderer(), const_cast<char *>(name.c_str()), IPLSimulationType::IPL_SIMTYPE_REALTIME, iplScene->GetIplInputFormat(), iplScene->GetIplOutputFormat(), &m_iplConvolutionEffect);
 	return (err == IPLerror::IPL_STATUS_SUCCESS) ? true : false;
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
 	// FMOD TODO
@@ -57,84 +57,83 @@ void al::SoundSource::ClearSteamSoundEffects()
 void al::SoundSource::SetSteamAudioEffectsEnabled(bool b)
 {
 	SetFMOD3DAttributesEffective(!b);
-	if(b == false)
-	{
+	if(b == false) {
 		ClearSteamSoundEffects();
 		m_steamAudioData = nullptr;
 		return;
 	}
 	m_steamAudioData = std::make_unique<SteamAudioData>(m_system.GetSteamAudioProperties());
 	auto &steamAudioData = *m_steamAudioData;
-	steamAudioData.properties.spatializer.directBinaural.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	steamAudioData.properties.spatializer.directBinaural.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_DIRECTBINAURAL,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_DIRECTBINAURAL, newVal.get()));
 	});
-	steamAudioData.properties.spatializer.distanceAttenuation.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	steamAudioData.properties.spatializer.distanceAttenuation.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_DISTANCEATTENUATION,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_DISTANCEATTENUATION, newVal.get()));
 	});
-	steamAudioData.properties.spatializer.airAbsorption.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	steamAudioData.properties.spatializer.airAbsorption.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_AIRABSORPTION,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_AIRABSORPTION, newVal.get()));
 	});
-	steamAudioData.properties.spatializer.indirect.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	steamAudioData.properties.spatializer.indirect.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_INDIRECT,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_INDIRECT, newVal.get()));
 	});
-	steamAudioData.properties.spatializer.indirectBinaural.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	steamAudioData.properties.spatializer.indirectBinaural.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_INDIRECTBINAURAL,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_INDIRECTBINAURAL, newVal.get()));
 	});
-	steamAudioData.properties.spatializer.staticListener.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	steamAudioData.properties.spatializer.staticListener.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_STATICLISTENER,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterBool(SA_SPATIALIZE_PARAM_STATICLISTENER, newVal.get()));
 	});
-	steamAudioData.properties.spatializer.HRTFInterpolation.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::SpatializerInterpolation> oldVal,std::reference_wrapper<const al::steam_audio::SpatializerInterpolation> newVal) {
+	steamAudioData.properties.spatializer.HRTFInterpolation.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::SpatializerInterpolation> oldVal, std::reference_wrapper<const al::steam_audio::SpatializerInterpolation> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterInt(SA_SPATIALIZE_PARAM_HRTFINTERPOLATION,umath::to_integral(newVal.get())));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterInt(SA_SPATIALIZE_PARAM_HRTFINTERPOLATION, umath::to_integral(newVal.get())));
 	});
-	steamAudioData.properties.spatializer.occlusionMode.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::SpatializerOcclusionMode> oldVal,std::reference_wrapper<const al::steam_audio::SpatializerOcclusionMode> newVal) {
+	steamAudioData.properties.spatializer.occlusionMode.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::SpatializerOcclusionMode> oldVal, std::reference_wrapper<const al::steam_audio::SpatializerOcclusionMode> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterInt(SA_SPATIALIZE_PARAM_OCCLUSIONMODE,umath::to_integral(newVal.get())));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterInt(SA_SPATIALIZE_PARAM_OCCLUSIONMODE, umath::to_integral(newVal.get())));
 	});
-	steamAudioData.properties.spatializer.occlusionMethod.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::OcclusionMethod> oldVal,std::reference_wrapper<const al::steam_audio::OcclusionMethod> newVal) {
+	steamAudioData.properties.spatializer.occlusionMethod.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::OcclusionMethod> oldVal, std::reference_wrapper<const al::steam_audio::OcclusionMethod> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterInt(SA_SPATIALIZE_PARAM_OCCLUSIONMETHOD,umath::to_integral(newVal.get())));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterInt(SA_SPATIALIZE_PARAM_OCCLUSIONMETHOD, umath::to_integral(newVal.get())));
 	});
-	steamAudioData.properties.spatializer.simulationType.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::SimulationType> oldVal,std::reference_wrapper<const al::steam_audio::SimulationType> newVal) {
+	steamAudioData.properties.spatializer.simulationType.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::SimulationType> oldVal, std::reference_wrapper<const al::steam_audio::SimulationType> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterInt(SA_SPATIALIZE_PARAM_SIMTYPE,umath::to_integral(newVal.get())));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterInt(SA_SPATIALIZE_PARAM_SIMTYPE, umath::to_integral(newVal.get())));
 	});
-	steamAudioData.properties.spatializer.directLevel.AddChangeCallback([this](std::reference_wrapper<const float> oldVal,std::reference_wrapper<const float> newVal) {
+	steamAudioData.properties.spatializer.directLevel.AddChangeCallback([this](std::reference_wrapper<const float> oldVal, std::reference_wrapper<const float> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterFloat(SA_SPATIALIZE_PARAM_DIRECTLEVEL,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterFloat(SA_SPATIALIZE_PARAM_DIRECTLEVEL, newVal.get()));
 	});
-	steamAudioData.properties.spatializer.indirectLevel.AddChangeCallback([this](std::reference_wrapper<const float> oldVal,std::reference_wrapper<const float> newVal) {
+	steamAudioData.properties.spatializer.indirectLevel.AddChangeCallback([this](std::reference_wrapper<const float> oldVal, std::reference_wrapper<const float> newVal) {
 		if(m_steamAudioData->dspSpatializer == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterFloat(SA_SPATIALIZE_PARAM_INDIRECTLEVEL,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspSpatializer->setParameterFloat(SA_SPATIALIZE_PARAM_INDIRECTLEVEL, newVal.get()));
 	});
 
-	steamAudioData.properties.reverb.indirectBinaural.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal,std::reference_wrapper<const bool> newVal) {
+	steamAudioData.properties.reverb.indirectBinaural.AddChangeCallback([this](std::reference_wrapper<const bool> oldVal, std::reference_wrapper<const bool> newVal) {
 		if(m_steamAudioData->dspReverb == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspReverb->setParameterBool(SA_REVERB_PARAM_BINAURAL,newVal.get()));
+		al::fmod::check_result(m_steamAudioData->dspReverb->setParameterBool(SA_REVERB_PARAM_BINAURAL, newVal.get()));
 	});
-	steamAudioData.properties.reverb.simulationType.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::SimulationType> oldVal,std::reference_wrapper<const al::steam_audio::SimulationType> newVal) {
+	steamAudioData.properties.reverb.simulationType.AddChangeCallback([this](std::reference_wrapper<const al::steam_audio::SimulationType> oldVal, std::reference_wrapper<const al::steam_audio::SimulationType> newVal) {
 		if(m_steamAudioData->dspReverb == nullptr)
 			return;
-		al::fmod::check_result(m_steamAudioData->dspReverb->setParameterInt(SA_REVERB_PARAM_SIMTYPE,umath::to_integral(newVal.get())));
+		al::fmod::check_result(m_steamAudioData->dspReverb->setParameterInt(SA_REVERB_PARAM_SIMTYPE, umath::to_integral(newVal.get())));
 	});
 }
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
@@ -142,8 +141,7 @@ extern FMOD_DSP_DESCRIPTION gReverbEffect;
 extern FMOD_DSP_DESCRIPTION gSpatializerEffect;
 void al::SoundSource::UpdateSteamAudioDSPEffects()
 {
-	if(m_system.IsSteamAudioEnabled() == false)
-	{
+	if(m_system.IsSteamAudioEnabled() == false) {
 		ClearSteamAudioSpatializerDSP();
 		ClearSteamAudioReverbDSP();
 		return;
@@ -195,7 +193,7 @@ FMOD::ChannelGroup &al::SoundSource::InitializeChannelGroup()
 	if(m_bCustomChannelGroup)
 		return *m_channelGroup;
 	m_bCustomChannelGroup = true;
-	al::fmod::check_result(m_system.GetFMODLowLevelSystem().createChannelGroup(nullptr,&m_channelGroup));
+	al::fmod::check_result(m_system.GetFMODLowLevelSystem().createChannelGroup(nullptr, &m_channelGroup));
 	SetChannelGroup(*m_channelGroup);
 	return *m_channelGroup;
 }
@@ -209,13 +207,12 @@ void al::SoundSource::UpdateSteamAudioAttributes()
 	attr.velocity = al::to_custom_vector<FMOD_VECTOR>(al::to_audio_position(GetVelocity()));
 	FMOD_DSP_PARAMETER_3DATTRIBUTES attrParam {};
 	attrParam.absolute = attr;
-	if(m_steamAudioData != nullptr && m_steamAudioData->dspSpatializer != nullptr)
-	{
-		m_steamAudioData->dspSpatializer->setParameterFloat(SA_SPATIALIZE_PARAM_SOURCERADIUS,al::to_audio_distance(GetRadius()));
-		m_steamAudioData->dspSpatializer->setParameterData(SA_SPATIALIZE_PARAM_SOURCEPOSITION,&attrParam,sizeof(attrParam));
+	if(m_steamAudioData != nullptr && m_steamAudioData->dspSpatializer != nullptr) {
+		m_steamAudioData->dspSpatializer->setParameterFloat(SA_SPATIALIZE_PARAM_SOURCERADIUS, al::to_audio_distance(GetRadius()));
+		m_steamAudioData->dspSpatializer->setParameterData(SA_SPATIALIZE_PARAM_SOURCEPOSITION, &attrParam, sizeof(attrParam));
 	}
 	if(m_steamAudioData != nullptr && m_steamAudioData->dspReverb != nullptr)
-		m_steamAudioData->dspReverb->setParameterData(SA_REVERB_PARAM_SOURCEPOSITION,&attrParam,sizeof(attrParam));
+		m_steamAudioData->dspReverb->setParameterData(SA_REVERB_PARAM_SOURCEPOSITION, &attrParam, sizeof(attrParam));
 }
 void al::SoundSource::UpdateSteamAudioIdentifier()
 {
@@ -223,67 +220,57 @@ void al::SoundSource::UpdateSteamAudioIdentifier()
 	IPLint32 identifier;
 	if(iplScene == nullptr)
 		return;
-	if(m_steamAudioData != nullptr && m_steamAudioData->dspSpatializer != nullptr && iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(),ipl::Scene::DSPEffect::Spatializer,identifier) == true)
-		m_steamAudioData->dspSpatializer->setParameterData(SA_SPATIALIZE_PARAM_NAME,&identifier,sizeof(identifier));
-	if(m_steamAudioData != nullptr && m_steamAudioData->dspReverb != nullptr && iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(),ipl::Scene::DSPEffect::Reverb,identifier) == true)
-		m_steamAudioData->dspReverb->setParameterData(SA_REVERB_PARAM_NAME,&identifier,sizeof(identifier));
+	if(m_steamAudioData != nullptr && m_steamAudioData->dspSpatializer != nullptr && iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(), ipl::Scene::DSPEffect::Spatializer, identifier) == true)
+		m_steamAudioData->dspSpatializer->setParameterData(SA_SPATIALIZE_PARAM_NAME, &identifier, sizeof(identifier));
+	if(m_steamAudioData != nullptr && m_steamAudioData->dspReverb != nullptr && iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(), ipl::Scene::DSPEffect::Reverb, identifier) == true)
+		m_steamAudioData->dspReverb->setParameterData(SA_REVERB_PARAM_NAME, &identifier, sizeof(identifier));
 }
-void al::SoundSource::SetSteamAudioSpatializerDSPEnabled(bool b,bool bForceReload)
+void al::SoundSource::SetSteamAudioSpatializerDSPEnabled(bool b, bool bForceReload)
 {
 	m_bSteamAudioSpatializerEnabled = b;
 	if(m_steamAudioData == nullptr)
 		return;
-	util::ScopeGuard sg([this]() {
-		ClearSteamAudioSpatializerDSP();
-	});
+	util::ScopeGuard sg([this]() { ClearSteamAudioSpatializerDSP(); });
 	if(b == false)
 		return;
-	if(bForceReload == true || m_steamAudioData->dspSpatializer == nullptr)
-	{
+	if(bForceReload == true || m_steamAudioData->dspSpatializer == nullptr) {
 		auto *iplScene = m_system.GetSteamAudioScene();
 		IPLint32 identifier;
-		if(m_steamAudioData->dspSpatializer != nullptr || iplScene == nullptr || iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(),ipl::Scene::DSPEffect::Spatializer,identifier) == false)
+		if(m_steamAudioData->dspSpatializer != nullptr || iplScene == nullptr || iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(), ipl::Scene::DSPEffect::Spatializer, identifier) == false)
 			return;
 		FMOD::DSP *dsp;
-		al::fmod::check_result(m_system.GetFMODLowLevelSystem().createDSP(&gSpatializerEffect,&dsp));
+		al::fmod::check_result(m_system.GetFMODLowLevelSystem().createDSP(&gSpatializerEffect, &dsp));
 
 		auto &channelGroup = InitializeChannelGroup();
-		al::fmod::check_result(channelGroup.addDSP(umath::to_integral(DSPEffectSlot::Spatializer),dsp));
+		al::fmod::check_result(channelGroup.addDSP(umath::to_integral(DSPEffectSlot::Spatializer), dsp));
 
-		m_steamAudioData->dspSpatializer = std::shared_ptr<FMOD::DSP>(dsp,[](FMOD::DSP *dsp) {
-			dsp->release();
-		});
+		m_steamAudioData->dspSpatializer = std::shared_ptr<FMOD::DSP>(dsp, [](FMOD::DSP *dsp) { dsp->release(); });
 	}
 	sg.dismiss();
 	UpdateSteamAudioIdentifier();
 	UpdateSteamAudioAttributes();
 	ApplySteamProperties();
 }
-void al::SoundSource::SetSteamAudioReverbDSPEnabled(bool b,bool bForceReload)
+void al::SoundSource::SetSteamAudioReverbDSPEnabled(bool b, bool bForceReload)
 {
 	m_bSteamAudioReverbEnabled = b;
 	if(m_steamAudioData == nullptr)
 		return;
-	util::ScopeGuard sg([this]() {
-		ClearSteamAudioReverbDSP();
-	});
+	util::ScopeGuard sg([this]() { ClearSteamAudioReverbDSP(); });
 	if(b == false)
 		return;
-	if(bForceReload == true || m_steamAudioData->dspReverb == nullptr)
-	{
+	if(bForceReload == true || m_steamAudioData->dspReverb == nullptr) {
 		auto *iplScene = m_system.GetSteamAudioScene();
 		IPLint32 identifier;
-		if(m_steamAudioData->dspReverb != nullptr || iplScene == nullptr || iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(),ipl::Scene::DSPEffect::Reverb,identifier) == false)
+		if(m_steamAudioData->dspReverb != nullptr || iplScene == nullptr || iplScene->FindBakedSoundSourceIdentifier(GetIdentifier(), ipl::Scene::DSPEffect::Reverb, identifier) == false)
 			return;
 		FMOD::DSP *dsp;
-		al::fmod::check_result(m_system.GetFMODLowLevelSystem().createDSP(&gReverbEffect,&dsp));
+		al::fmod::check_result(m_system.GetFMODLowLevelSystem().createDSP(&gReverbEffect, &dsp));
 
 		auto &channelGroup = InitializeChannelGroup();
-		al::fmod::check_result(channelGroup.addDSP(umath::to_integral(DSPEffectSlot::Reverb),dsp));
+		al::fmod::check_result(channelGroup.addDSP(umath::to_integral(DSPEffectSlot::Reverb), dsp));
 
-		m_steamAudioData->dspReverb = std::shared_ptr<FMOD::DSP>(dsp,[](FMOD::DSP *dsp) {
-			dsp->release();
-		});
+		m_steamAudioData->dspReverb = std::shared_ptr<FMOD::DSP>(dsp, [](FMOD::DSP *dsp) { dsp->release(); });
 	}
 	sg.dismiss();
 	UpdateSteamAudioIdentifier();

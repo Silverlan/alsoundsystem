@@ -10,36 +10,35 @@
 #include <memory>
 
 #pragma warning(push)
-#pragma warning(disable:4251)
+#pragma warning(disable : 4251)
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-namespace alure {class Decoder;};
+namespace alure {
+	class Decoder;
+};
 #endif
-namespace al
-{
+namespace al {
 	class SoundSystem;
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	class DLLALSYS Decoder
-		: public impl::BufferBase,public std::enable_shared_from_this<Decoder>
-	{
-	public:
+	class DLLALSYS Decoder : public impl::BufferBase, public std::enable_shared_from_this<Decoder> {
+	  public:
 		~Decoder();
 
 		virtual uint32_t GetFrequency() const override;
 		virtual ChannelConfig GetChannelConfig() const override;
 		virtual SampleType GetSampleType() const override;
 		virtual uint64_t GetLength() const override;
-		virtual std::pair<uint64_t,uint64_t> GetLoopFramePoints() const override;
+		virtual std::pair<uint64_t, uint64_t> GetLoopFramePoints() const override;
 
 		bool Seek(uint64_t frame);
-	private:
+	  private:
 		friend SoundSystem;
 
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	public:
+	  public:
 		const std::shared_ptr<alure::Decoder> &GetALDecoder() const;
 		std::shared_ptr<alure::Decoder> &GetALDecoder();
-	private:
-		Decoder(const std::shared_ptr<alure::Decoder> &decoder,const std::string &path="");
+	  private:
+		Decoder(const std::shared_ptr<alure::Decoder> &decoder, const std::string &path = "");
 		std::shared_ptr<alure::Decoder> m_decoder = nullptr;
 #endif
 	};

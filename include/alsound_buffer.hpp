@@ -10,45 +10,42 @@
 #include <memory>
 
 #pragma warning(push)
-#pragma warning(disable:4251)
+#pragma warning(disable : 4251)
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-namespace alure {class Context; class Buffer;};
+namespace alure {
+	class Context;
+	class Buffer;
+};
 #elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-namespace FMOD
-{
+namespace FMOD {
 	class System;
 	class Sound;
 };
 #endif
-namespace al
-{
+namespace al {
 	class SoundSystem;
-	class DLLALSYS ISoundBuffer
-		: public impl::BufferBase,public std::enable_shared_from_this<ISoundBuffer>
-	{
-	public:
+	class DLLALSYS ISoundBuffer : public impl::BufferBase, public std::enable_shared_from_this<ISoundBuffer> {
+	  public:
 		virtual ~ISoundBuffer() override {}
 
-		virtual bool IsReady() const=0;
+		virtual bool IsReady() const = 0;
 
-		virtual uint32_t GetSize() const=0;
-		virtual void SetLoopFramePoints(uint32_t start,uint32_t end)=0;
-		virtual void SetLoopTimePoints(float tStart,float tEnd)=0;
+		virtual uint32_t GetSize() const = 0;
+		virtual void SetLoopFramePoints(uint32_t start, uint32_t end) = 0;
+		virtual void SetLoopTimePoints(float tStart, float tEnd) = 0;
 		// GetSources() ?
 
-		virtual std::string GetName() const=0;
-		virtual bool IsInUse() const=0;
-	private:
+		virtual std::string GetName() const = 0;
+		virtual bool IsInUse() const = 0;
+	  private:
 		friend SoundSystem;
 	};
 	class ISoundBuffer;
 	using PSoundBuffer = std::shared_ptr<ISoundBuffer>;
 
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	class DLLALSYS Decoder
-		: public ISoundBuffer
-	{
-	public:
+	class DLLALSYS Decoder : public ISoundBuffer {
+	  public:
 		using ISoundBuffer::ISoundBuffer;
 	};
 #endif

@@ -4,12 +4,8 @@
 
 #include "impl_alsound_buffer_base.hpp"
 
-al::impl::BufferLoadData::BufferLoadData(SoundSystem &sys)
-	: soundSystem(sys)
-{}
-al::impl::BufferBase::BufferBase::BufferBase(const std::string &path)
-	: m_filePath(path)
-{}
+al::impl::BufferLoadData::BufferLoadData(SoundSystem &sys) : soundSystem(sys) {}
+al::impl::BufferBase::BufferBase::BufferBase(const std::string &path) : m_filePath(path) {}
 
 #if 0
 std::string al::impl::BufferBase::GetChannelConfigName() const
@@ -31,31 +27,30 @@ std::string al::impl::BufferBase::GetSampleTypeName() const
 #endif
 }
 #endif
-std::string al::impl::BufferBase::GetFilePath() const {return m_filePath;}
+std::string al::impl::BufferBase::GetFilePath() const { return m_filePath; }
 
-void al::impl::BufferBase::SetTargetChannelConfig(ChannelConfig config) {m_targetChannelConfig = std::make_unique<ChannelConfig>(config);}
-al::ChannelConfig al::impl::BufferBase::GetTargetChannelConfig() const {return (m_targetChannelConfig != nullptr) ? *m_targetChannelConfig : GetChannelConfig();}
+void al::impl::BufferBase::SetTargetChannelConfig(ChannelConfig config) { m_targetChannelConfig = std::make_unique<ChannelConfig>(config); }
+al::ChannelConfig al::impl::BufferBase::GetTargetChannelConfig() const { return (m_targetChannelConfig != nullptr) ? *m_targetChannelConfig : GetChannelConfig(); }
 
-float al::impl::BufferBase::GetInverseFrequency() const {return 1.f /GetFrequency();}
-float al::impl::BufferBase::GetDuration() const {return GetLength() *GetInverseFrequency();}
+float al::impl::BufferBase::GetInverseFrequency() const { return 1.f / GetFrequency(); }
+float al::impl::BufferBase::GetDuration() const { return GetLength() * GetInverseFrequency(); }
 
-void al::impl::BufferBase::SetUserData(const std::shared_ptr<void> &userData) {m_userData = userData;}
-std::shared_ptr<void> al::impl::BufferBase::GetUserData() const {return m_userData;}
+void al::impl::BufferBase::SetUserData(const std::shared_ptr<void> &userData) { m_userData = userData; }
+std::shared_ptr<void> al::impl::BufferBase::GetUserData() const { return m_userData; }
 
-std::pair<float,float> al::impl::BufferBase::GetLoopTimePoints() const
+std::pair<float, float> al::impl::BufferBase::GetLoopTimePoints() const
 {
 	auto loopPoints = GetLoopFramePoints();
 	auto l = static_cast<float>(GetLength());
 	auto start = 0.f;
 	auto end = 0.f;
-	if(l > 0)
-	{
+	if(l > 0) {
 		auto dur = GetDuration();
-		start = (loopPoints.first /l) *dur;
-		end = (loopPoints.second /l) *dur;
+		start = (loopPoints.first / l) * dur;
+		end = (loopPoints.second / l) * dur;
 	}
-	return {start,end};
+	return {start, end};
 }
 
-bool al::impl::BufferBase::IsMono() const {return (GetChannelConfig() == al::ChannelConfig::Mono) ? true : false;}
-bool al::impl::BufferBase::IsStereo() const {return (GetChannelConfig() == al::ChannelConfig::Stereo) ? true : false;}
+bool al::impl::BufferBase::IsMono() const { return (GetChannelConfig() == al::ChannelConfig::Mono) ? true : false; }
+bool al::impl::BufferBase::IsStereo() const { return (GetChannelConfig() == al::ChannelConfig::Stereo) ? true : false; }

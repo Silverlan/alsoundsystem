@@ -25,19 +25,19 @@
 #endif
 
 #ifdef ALSYS_STATIC
-	#define DLLALSYS
+#define DLLALSYS
 #elif ALSYS_DLL
-	#ifdef __linux__
-		#define DLLALSYS __attribute__((visibility("default")))
-	#else
-		#define DLLALSYS __declspec(dllexport)
-	#endif
+#ifdef __linux__
+#define DLLALSYS __attribute__((visibility("default")))
 #else
-	#ifdef __linux__
-		#define DLLALSYS
-	#else
-		#define DLLALSYS __declspec(dllimport)
-	#endif
+#define DLLALSYS __declspec(dllexport)
+#endif
+#else
+#ifdef __linux__
+#define DLLALSYS
+#else
+#define DLLALSYS __declspec(dllimport)
+#endif
 #endif
 
 #endif

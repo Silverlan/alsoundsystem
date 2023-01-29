@@ -9,26 +9,24 @@
 #include <memory>
 
 #pragma warning(push)
-#pragma warning(disable:4251)
-namespace al
-{
+#pragma warning(disable : 4251)
+namespace al {
 	class ISoundSystem;
 	class IEffect;
-	class DLLALSYS IAuxiliaryEffectSlot
-	{
-	public:
+	class DLLALSYS IAuxiliaryEffectSlot {
+	  public:
 		virtual ~IAuxiliaryEffectSlot() {}
 
-		virtual void SetGain(float gain)=0;
-		virtual float GetGain() const=0;
+		virtual void SetGain(float gain) = 0;
+		virtual float GetGain() const = 0;
 
-		virtual void SetSendAuto(bool bAuto)=0;
-		virtual bool GetSendAuto() const=0;
+		virtual void SetSendAuto(bool bAuto) = 0;
+		virtual bool GetSendAuto() const = 0;
 
-		virtual void ApplyEffect(const IEffect &effect)=0;
+		virtual void ApplyEffect(const IEffect &effect) = 0;
 
-		virtual bool IsInUse() const=0;
-	private:
+		virtual bool IsInUse() const = 0;
+	  private:
 		IAuxiliaryEffectSlot();
 
 		friend ISoundSystem;

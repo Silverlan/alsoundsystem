@@ -11,8 +11,7 @@
 #include <array>
 #include <mathutil/umath.h>
 
-namespace al
-{
+namespace al {
 	struct EffectParams;
 	class SoundSource;
 	class Decoder;
@@ -29,29 +28,23 @@ namespace al
 	using PDecoder = std::shared_ptr<Decoder>;
 	using PAuxiliaryEffectSlot = std::shared_ptr<IAuxiliaryEffectSlot>;
 	using PSoundBuffer = std::shared_ptr<ISoundBuffer>;
-	
-	using SoundSourceFactory = std::function<PSoundSource(const PSoundChannel&)>;
 
-	DECLARE_BASE_HANDLE(DLLALSYS,IEffect,Effect);
-	DECLARE_BASE_HANDLE(DLLALSYS,SoundSource,SoundSource);
+	using SoundSourceFactory = std::function<PSoundSource(const PSoundChannel &)>;
 
-	struct DLLALSYS EffectParams
-	{
-		EffectParams(float gain=1.f,float gainHF=1.f,float gainLF=1.f);
+	DECLARE_BASE_HANDLE(DLLALSYS, IEffect, Effect);
+	DECLARE_BASE_HANDLE(DLLALSYS, SoundSource, SoundSource);
+
+	struct DLLALSYS EffectParams {
+		EffectParams(float gain = 1.f, float gainHF = 1.f, float gainLF = 1.f);
 		float gain = 1.f;
 		float gainHF = 1.f; // For low-pass and band-pass filters
 		float gainLF = 1.f; // For high-pass and band-pass filters
 	};
 
-	enum class ChannelType : uint32_t
-	{
-		Mono = 0,
-		Stereo
-	};
+	enum class ChannelType : uint32_t { Mono = 0, Stereo };
 
 	// See alure2.h
-	enum class ChannelConfig : uint32_t
-	{
+	enum class ChannelConfig : uint32_t {
 		/** 1-channel mono sound. */
 		Mono,
 		/** 2-channel stereo sound. */
@@ -72,24 +65,9 @@ namespace al
 		BFormat3D
 	};
 
-	enum class SampleType : uint32_t
-	{
-		UInt8,
-		Int16,
-		Float32,
-		Mulaw
-	};
+	enum class SampleType : uint32_t { UInt8, Int16, Float32, Mulaw };
 
-	enum class DistanceModel : uint32_t
-	{
-		InverseClamped  = 0xD002,
-		LinearClamped   = 0xD004,
-		ExponentClamped = 0xD006,
-		Inverse  = 0xD001,
-		Linear   = 0xD003,
-		Exponent = 0xD005,
-		None  = 0
-	};
+	enum class DistanceModel : uint32_t { InverseClamped = 0xD002, LinearClamped = 0xD004, ExponentClamped = 0xD006, Inverse = 0xD001, Linear = 0xD003, Exponent = 0xD005, None = 0 };
 
 	struct DLLALSYS FilterParams {
 		float mGain;

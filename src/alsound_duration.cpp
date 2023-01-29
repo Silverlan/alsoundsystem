@@ -5,4 +5,4 @@
 #include "alsoundsystem.hpp"
 #include <util_sound.hpp>
 
-bool al::get_sound_duration(const std::string path,float &duration) {return util::sound::get_duration(path,duration);}
+bool al::get_sound_duration(const std::string path, float &duration) { return util::sound::get_duration(path, duration); }

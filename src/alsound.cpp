@@ -10,15 +10,15 @@
 #include "alsoundsystem.hpp"
 #include "alsound_coordinate_system.hpp"
 
-namespace al
-{
-	DEFINE_BASE_HANDLE(DLLALSYS,SoundSource,SoundSource);
+namespace al {
+	DEFINE_BASE_HANDLE(DLLALSYS, SoundSource, SoundSource);
 };
 
-al::ISoundChannel::ISoundChannel(ISoundSystem &system,Decoder &decoder)
-	: m_system(system),m_decoder(std::static_pointer_cast<Decoder>(decoder.shared_from_this()))
+al::ISoundChannel::ISoundChannel(ISoundSystem &system, Decoder &decoder)
+    : m_system(system), m_decoder(std::static_pointer_cast<Decoder>(decoder.shared_from_this()))
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-	,m_bSteamAudioSpatializerEnabled(system.GetSteamAudioSpatializerEnabled()),m_bSteamAudioReverbEnabled(system.GetSteamAudioReverbEnabled())
+      ,
+      m_bSteamAudioSpatializerEnabled(system.GetSteamAudioSpatializerEnabled()), m_bSteamAudioReverbEnabled(system.GetSteamAudioReverbEnabled())
 #endif
 {
 	OnReady();
@@ -27,10 +27,11 @@ al::ISoundChannel::ISoundChannel(ISoundSystem &system,Decoder &decoder)
 #endif
 }
 
-al::ISoundChannel::ISoundChannel(ISoundSystem &system,ISoundBuffer &buffer)
-	: m_system(system),m_buffer(buffer.shared_from_this()),m_bReady(buffer.IsReady())
+al::ISoundChannel::ISoundChannel(ISoundSystem &system, ISoundBuffer &buffer)
+    : m_system(system), m_buffer(buffer.shared_from_this()), m_bReady(buffer.IsReady())
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-	,m_bSteamAudioSpatializerEnabled(system.GetSteamAudioSpatializerEnabled()),m_bSteamAudioReverbEnabled(system.GetSteamAudioReverbEnabled())
+      ,
+      m_bSteamAudioSpatializerEnabled(system.GetSteamAudioSpatializerEnabled()), m_bSteamAudioReverbEnabled(system.GetSteamAudioReverbEnabled())
 #endif
 {
 	if(m_bReady == true)
@@ -51,8 +52,7 @@ al::ISoundChannel::~ISoundChannel()
 
 void al::ISoundChannel::OnReady()
 {
-	if(m_bSchedulePlay == true)
-	{
+	if(m_bSchedulePlay == true) {
 		m_bSchedulePlay = false;
 		Play();
 	}
@@ -60,57 +60,51 @@ void al::ISoundChannel::OnReady()
 
 void al::ISoundChannel::Update()
 {
-	if(m_bReady == false && m_buffer.expired() == false && m_buffer.lock()->IsReady() == true)
-	{
+	if(m_bReady == false && m_buffer.expired() == false && m_buffer.lock()->IsReady() == true) {
 		m_bReady = true;
 		OnReady();
 	}
 }
-bool al::ISoundChannel::IsIdle() const {return !IsPlaying();}
+bool al::ISoundChannel::IsIdle() const { return !IsPlaying(); }
 
-std::vector<al::IEffect*> al::ISoundChannel::GetEffects()
+std::vector<al::IEffect *> al::ISoundChannel::GetEffects()
 {
-	std::vector<al::IEffect*> effects;
+	std::vector<al::IEffect *> effects;
 	effects.reserve(m_effects.size());
 	for(auto &effect : m_effects)
 		effects.push_back(effect.first.get());
 	return effects;
 }
-void al::ISoundChannel::SetEffectParameters(IEffect &effect,const EffectParams &params)
+void al::ISoundChannel::SetEffectParameters(IEffect &effect, const EffectParams &params)
 {
-	auto it = std::find_if(m_effects.begin(),m_effects.end(),[&effect](const std::pair<std::shared_ptr<IEffect>,uint32_t> &pair) {
-		return (pair.first.get() == &effect) ? true : false;
-	});
+	auto it = std::find_if(m_effects.begin(), m_effects.end(), [&effect](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.first.get() == &effect) ? true : false; });
 	if(it == m_effects.end())
 		return;
-	SetEffectParameters(it->second,params);
+	SetEffectParameters(it->second, params);
 }
-void al::ISoundChannel::SetEffectGain(IEffect &effect,float gain)
+void al::ISoundChannel::SetEffectGain(IEffect &effect, float gain)
 {
 	EffectParams params {};
 	params.gain = gain;
-	SetEffectParameters(effect,params);
+	SetEffectParameters(effect, params);
 }
-void al::ISoundChannel::SetEffectGain(uint32_t slotId,float gain)
+void al::ISoundChannel::SetEffectGain(uint32_t slotId, float gain)
 {
 	EffectParams params {};
 	params.gain = gain;
-	SetEffectParameters(slotId,params);
+	SetEffectParameters(slotId, params);
 }
-const al::EffectParams &al::ISoundChannel::GetDirectFilter() const {return m_directFilter;}
-bool al::ISoundChannel::AddEffect(IEffect &effect,uint32_t &slotId,const EffectParams &params)
+const al::EffectParams &al::ISoundChannel::GetDirectFilter() const { return m_directFilter; }
+bool al::ISoundChannel::AddEffect(IEffect &effect, uint32_t &slotId, const EffectParams &params)
 {
 	slotId = std::numeric_limits<uint32_t>::max();
-	auto it = std::find_if(m_effects.begin(),m_effects.end(),[&effect](const std::pair<std::shared_ptr<IEffect>,uint32_t> &pair) {
-		return (pair.first.get() == &effect) ? true : false;
-	});
+	auto it = std::find_if(m_effects.begin(), m_effects.end(), [&effect](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.first.get() == &effect) ? true : false; });
 	if(it != m_effects.end())
 		return false;
 	auto bNewId = false;
 	if(m_freeAuxEffectIds.empty() == false)
 		slotId = m_freeAuxEffectIds.front();
-	else
-	{
+	else {
 		slotId = m_nextAuxSlot;
 		bNewId = true;
 		if(slotId >= m_system.GetMaxAuxiliaryEffectsPerSource())
@@ -124,26 +118,26 @@ bool al::ISoundChannel::AddEffect(IEffect &effect,uint32_t &slotId,const EffectP
 	else
 		++m_nextAuxSlot;
 
-	m_effects.push_back({effect.shared_from_this(),slotId});
-	DoAddEffect(*slot,slotId,params);
+	m_effects.push_back({effect.shared_from_this(), slotId});
+	DoAddEffect(*slot, slotId, params);
 	return true;
 }
-bool al::ISoundChannel::AddEffect(IEffect &effect,const EffectParams &params)
+bool al::ISoundChannel::AddEffect(IEffect &effect, const EffectParams &params)
 {
 	uint32_t slotId;
-	return AddEffect(effect,slotId,params);
+	return AddEffect(effect, slotId, params);
 }
-bool al::ISoundChannel::AddEffect(IEffect &effect,float gain)
+bool al::ISoundChannel::AddEffect(IEffect &effect, float gain)
 {
 	EffectParams params {};
 	params.gain = gain;
-	return AddEffect(effect,params);
+	return AddEffect(effect, params);
 }
-bool al::ISoundChannel::AddEffect(IEffect &effect,uint32_t &slotId,float gain)
+bool al::ISoundChannel::AddEffect(IEffect &effect, uint32_t &slotId, float gain)
 {
 	EffectParams params {};
 	params.gain = gain;
-	return AddEffect(effect,slotId,params);
+	return AddEffect(effect, slotId, params);
 }
 void al::ISoundChannel::RemoveEffects()
 {
@@ -162,9 +156,7 @@ void al::ISoundChannel::RemoveInternalEffect(decltype(m_effects)::iterator it)
 }
 void al::ISoundChannel::RemoveEffect(uint32_t slotId)
 {
-	auto it = std::find_if(m_effects.begin(),m_effects.end(),[slotId](const std::pair<std::shared_ptr<IEffect>,uint32_t> &pair) {
-		return (pair.second == slotId) ? true : false;
-	});
+	auto it = std::find_if(m_effects.begin(), m_effects.end(), [slotId](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.second == slotId) ? true : false; });
 	if(it == m_effects.end())
 		return;
 	RemoveInternalEffect(it);
@@ -172,9 +164,7 @@ void al::ISoundChannel::RemoveEffect(uint32_t slotId)
 void al::ISoundChannel::RemoveEffect(IEffect &effect)
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-	auto it = std::find_if(m_effects.begin(),m_effects.end(),[&effect](const std::pair<std::shared_ptr<IEffect>,uint32_t> &pair) {
-		return (pair.first.get() == &effect) ? true : false;
-	});
+	auto it = std::find_if(m_effects.begin(), m_effects.end(), [&effect](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.first.get() == &effect) ? true : false; });
 	if(it == m_effects.end())
 		return;
 	auto slotId = it->second;
@@ -187,44 +177,43 @@ void al::ISoundChannel::RemoveEffect(IEffect &effect)
 #endif
 }
 
-al::ISoundSystem &al::ISoundChannel::GetSoundSystem() const {return m_system;}
+al::ISoundSystem &al::ISoundChannel::GetSoundSystem() const { return m_system; }
 
-const al::ISoundBuffer *al::ISoundChannel::GetBuffer() const {return const_cast<ISoundChannel*>(this)->GetBuffer();}
-al::ISoundBuffer *al::ISoundChannel::GetBuffer() {return m_buffer.lock().get();}
-const al::Decoder *al::ISoundChannel::GetDecoder() const {return const_cast<ISoundChannel*>(this)->GetDecoder();}
-al::Decoder *al::ISoundChannel::GetDecoder() {return m_decoder.get();}
+const al::ISoundBuffer *al::ISoundChannel::GetBuffer() const { return const_cast<ISoundChannel *>(this)->GetBuffer(); }
+al::ISoundBuffer *al::ISoundChannel::GetBuffer() { return m_buffer.lock().get(); }
+const al::Decoder *al::ISoundChannel::GetDecoder() const { return const_cast<ISoundChannel *>(this)->GetDecoder(); }
+al::Decoder *al::ISoundChannel::GetDecoder() { return m_decoder.get(); }
 
 float al::ISoundChannel::GetMaxAudibleDistance() const
 {
 	float rolloff = GetRolloffFactor();
 	if(rolloff == 0.f)
 		return std::numeric_limits<float>::max();
-	return (GetMaxDistance() -GetReferenceDistance()) *(1.f /rolloff) +GetReferenceDistance();
+	return (GetMaxDistance() - GetReferenceDistance()) * (1.f / rolloff) + GetReferenceDistance();
 }
 
 al::impl::BufferBase *al::ISoundChannel::GetBaseBuffer() const
 {
 	if(m_decoder != nullptr)
-		return static_cast<al::impl::BufferBase*>(m_decoder.get());
+		return static_cast<al::impl::BufferBase *>(m_decoder.get());
 	if(m_buffer.expired() == true)
 		return nullptr;
-	return static_cast<al::impl::BufferBase*>(m_buffer.lock().get());
+	return static_cast<al::impl::BufferBase *>(m_buffer.lock().get());
 }
 
 void al::ISoundChannel::SetOffset(float offset)
 {
-	offset = umath::clamp(offset,0.f,1.f);
-	SetFrameOffset(offset *GetFrameLength());
+	offset = umath::clamp(offset, 0.f, 1.f);
+	SetFrameOffset(offset * GetFrameLength());
 }
 void al::ISoundChannel::SetTimeOffset(float offset)
 {
 	auto dur = GetDuration();
-	if(dur == 0.f)
-	{
+	if(dur == 0.f) {
 		SetOffset(0.f);
 		return;
 	}
-	SetOffset(offset /dur);
+	SetOffset(offset / dur);
 }
 uint64_t al::ISoundChannel::GetFrameLength() const
 {
@@ -238,9 +227,9 @@ float al::ISoundChannel::GetOffset() const
 	auto l = GetFrameLength();
 	if(l == 0)
 		return 0.f;
-	return GetFrameOffset() /static_cast<float>(l);
+	return GetFrameOffset() / static_cast<float>(l);
 }
-float al::ISoundChannel::GetTimeOffset() const {return GetOffset() *GetDuration();}
+float al::ISoundChannel::GetTimeOffset() const { return GetOffset() * GetDuration(); }
 void al::ISoundChannel::SetIdentifier(const std::string &identifier)
 {
 	m_identifier = identifier;
@@ -250,16 +239,16 @@ void al::ISoundChannel::SetIdentifier(const std::string &identifier)
 #endif
 #endif
 }
-const std::string &al::ISoundChannel::GetIdentifier() const {return m_identifier;}
-bool al::ISoundChannel::IsStopped() const {return (IsPlaying() == false && GetOffset() == 0.f) ? true : false;}
+const std::string &al::ISoundChannel::GetIdentifier() const { return m_identifier; }
+bool al::ISoundChannel::IsStopped() const { return (IsPlaying() == false && GetOffset() == 0.f) ? true : false; }
 
-void al::ISoundChannel::SetMinGain(float gain) {SetGainRange(gain,GetMaxGain());}
-void al::ISoundChannel::SetMaxGain(float gain) {SetGainRange(GetMinGain(),gain);}
+void al::ISoundChannel::SetMinGain(float gain) { SetGainRange(gain, GetMaxGain()); }
+void al::ISoundChannel::SetMaxGain(float gain) { SetGainRange(GetMinGain(), gain); }
 
-void al::ISoundChannel::SetReferenceDistance(float dist) {SetDistanceRange(dist,GetMaxDistance());}
-float al::ISoundChannel::GetReferenceDistance() const {return GetDistanceRange().first;}
-void al::ISoundChannel::SetMaxDistance(float dist) {SetDistanceRange(GetReferenceDistance(),dist);}
-float al::ISoundChannel::GetMaxDistance() const {return GetDistanceRange().second;}
+void al::ISoundChannel::SetReferenceDistance(float dist) { SetDistanceRange(dist, GetMaxDistance()); }
+float al::ISoundChannel::GetReferenceDistance() const { return GetDistanceRange().first; }
+void al::ISoundChannel::SetMaxDistance(float dist) { SetDistanceRange(GetReferenceDistance(), dist); }
+float al::ISoundChannel::GetMaxDistance() const { return GetDistanceRange().second; }
 
 Vector3 al::ISoundChannel::GetWorldPosition() const
 {
@@ -268,34 +257,34 @@ Vector3 al::ISoundChannel::GetWorldPosition() const
 	auto &listener = m_system.GetListener();
 	auto &lpos = listener.GetPosition();
 	auto &lorientation = listener.GetOrientation();
-	auto lrot = uquat::create(lorientation.first,uvec::cross(lorientation.first,lorientation.second),lorientation.second);
+	auto lrot = uquat::create(lorientation.first, uvec::cross(lorientation.first, lorientation.second), lorientation.second);
 	auto pos = GetPosition();
-	uvec::local_to_world(lpos,lrot,pos);
+	uvec::local_to_world(lpos, lrot, pos);
 	return pos;
 }
 
-void al::ISoundChannel::SetInnerConeAngle(float inner) {SetConeAngles(inner,GetOuterConeAngle());}
-float al::ISoundChannel::GetInnerConeAngle() const {return GetConeAngles().first;}
-void al::ISoundChannel::SetOuterConeAngle(float outer) {SetConeAngles(GetInnerConeAngle(),outer);}
-float al::ISoundChannel::GetOuterConeAngle() const {return GetConeAngles().second;}
+void al::ISoundChannel::SetInnerConeAngle(float inner) { SetConeAngles(inner, GetOuterConeAngle()); }
+float al::ISoundChannel::GetInnerConeAngle() const { return GetConeAngles().first; }
+void al::ISoundChannel::SetOuterConeAngle(float outer) { SetConeAngles(GetInnerConeAngle(), outer); }
+float al::ISoundChannel::GetOuterConeAngle() const { return GetConeAngles().second; }
 
 void al::ISoundChannel::SetOuterConeGain(float gain)
 {
 	auto gains = GetOuterConeGains();
-	SetOuterConeGains(gain,gains.second);
+	SetOuterConeGains(gain, gains.second);
 }
 void al::ISoundChannel::SetOuterConeGainHF(float gain)
 {
 	auto gains = GetOuterConeGains();
-	SetOuterConeGains(gains.first,gain);
+	SetOuterConeGains(gains.first, gain);
 }
 
-void al::ISoundChannel::SetRoomRolloffFactor(float roomFactor) {SetRolloffFactors(GetRolloffFactor(),roomFactor);}
+void al::ISoundChannel::SetRoomRolloffFactor(float roomFactor) { SetRolloffFactors(GetRolloffFactor(), roomFactor); }
 
-void al::ISoundChannel::SetLeftStereoAngle(float ang) {SetStereoAngles(ang,GetRightStereoAngle());}
-float al::ISoundChannel::GetLeftStereoAngle() const {return GetStereoAngles().first;}
-void al::ISoundChannel::SetRightStereoAngle(float ang) {SetStereoAngles(GetLeftStereoAngle(),ang);}
-float al::ISoundChannel::GetRightStereoAngle() const {return GetStereoAngles().second;}
+void al::ISoundChannel::SetLeftStereoAngle(float ang) { SetStereoAngles(ang, GetRightStereoAngle()); }
+float al::ISoundChannel::GetLeftStereoAngle() const { return GetStereoAngles().first; }
+void al::ISoundChannel::SetRightStereoAngle(float ang) { SetStereoAngles(GetLeftStereoAngle(), ang); }
+float al::ISoundChannel::GetRightStereoAngle() const { return GetStereoAngles().second; }
 
 float al::ISoundChannel::GetDuration() const
 {
@@ -322,15 +311,15 @@ uint64_t al::ISoundChannel::GetLength() const
 	auto *buf = GetBaseBuffer();
 	return (buf != nullptr) ? buf->GetLength() : 0;
 }
-std::pair<uint64_t,uint64_t> al::ISoundChannel::GetLoopFramePoints() const
+std::pair<uint64_t, uint64_t> al::ISoundChannel::GetLoopFramePoints() const
 {
 	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetLoopFramePoints() : std::pair<uint64_t,uint64_t>(0,0);
+	return (buf != nullptr) ? buf->GetLoopFramePoints() : std::pair<uint64_t, uint64_t>(0, 0);
 }
-std::pair<float,float> al::ISoundChannel::GetLoopTimePoints() const
+std::pair<float, float> al::ISoundChannel::GetLoopTimePoints() const
 {
 	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetLoopTimePoints() : std::pair<float,float>(0,0);
+	return (buf != nullptr) ? buf->GetLoopTimePoints() : std::pair<float, float>(0, 0);
 }
 
 float al::ISoundChannel::GetInverseFrequency() const
@@ -351,13 +340,8 @@ bool al::ISoundChannel::IsStereo() const
 
 ////////
 
-al::SoundSource::SoundSource(const std::shared_ptr<ISoundChannel> &channel)
-	: m_channel{channel},m_handle{this}
-{}
-al::SoundSource::~SoundSource()
-{
-	m_handle.Invalidate();
-}
-al::SoundSourceHandle al::SoundSource::GetHandle() const {return m_handle;}
+al::SoundSource::SoundSource(const std::shared_ptr<ISoundChannel> &channel) : m_channel {channel}, m_handle {this} {}
+al::SoundSource::~SoundSource() { m_handle.Invalidate(); }
+al::SoundSourceHandle al::SoundSource::GetHandle() const { return m_handle; }
 
-void al::SoundSource::OnRelease() {m_channel->GetSoundSystem().OnSoundRelease(*this);}
+void al::SoundSource::OnRelease() { m_channel->GetSoundSystem().OnSoundRelease(*this); }
