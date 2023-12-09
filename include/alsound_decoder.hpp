@@ -23,11 +23,9 @@ namespace al {
 	  public:
 		~Decoder();
 
-		virtual uint32_t GetFrequency() const override;
-		virtual ChannelConfig GetChannelConfig() const override;
-		virtual SampleType GetSampleType() const override;
-		virtual uint64_t GetLength() const override;
-		virtual std::pair<uint64_t, uint64_t> GetLoopFramePoints() const override;
+		virtual double GetDuration() const override;
+		virtual double GetLoopPoint() const override;
+		virtual void SetLoopPoint(double t) override;
 
 		bool Seek(uint64_t frame);
 	  private:

@@ -201,35 +201,6 @@ al::impl::BufferBase *al::ISoundChannel::GetBaseBuffer() const
 	return static_cast<al::impl::BufferBase *>(m_buffer.lock().get());
 }
 
-void al::ISoundChannel::SetOffset(float offset)
-{
-	offset = umath::clamp(offset, 0.f, 1.f);
-	SetFrameOffset(offset * GetFrameLength());
-}
-void al::ISoundChannel::SetTimeOffset(float offset)
-{
-	auto dur = GetDuration();
-	if(dur == 0.f) {
-		SetOffset(0.f);
-		return;
-	}
-	SetOffset(offset / dur);
-}
-uint64_t al::ISoundChannel::GetFrameLength() const
-{
-	auto *buf = GetBaseBuffer();
-	if(buf == nullptr)
-		return 0;
-	return buf->GetLength();
-}
-float al::ISoundChannel::GetOffset() const
-{
-	auto l = GetFrameLength();
-	if(l == 0)
-		return 0.f;
-	return GetFrameOffset() / static_cast<float>(l);
-}
-float al::ISoundChannel::GetTimeOffset() const { return GetOffset() * GetDuration(); }
 void al::ISoundChannel::SetIdentifier(const std::string &identifier)
 {
 	m_identifier = identifier;
@@ -291,42 +262,7 @@ float al::ISoundChannel::GetDuration() const
 	auto *buf = GetBaseBuffer();
 	return (buf != nullptr) ? buf->GetDuration() : 0.f;
 }
-uint32_t al::ISoundChannel::GetFrequency() const
-{
-	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetFrequency() : 0;
-}
-al::ChannelConfig al::ISoundChannel::GetChannelConfig() const
-{
-	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetChannelConfig() : static_cast<ChannelConfig>(0);
-}
-al::SampleType al::ISoundChannel::GetSampleType() const
-{
-	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetSampleType() : static_cast<SampleType>(0);
-}
-uint64_t al::ISoundChannel::GetLength() const
-{
-	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetLength() : 0;
-}
-std::pair<uint64_t, uint64_t> al::ISoundChannel::GetLoopFramePoints() const
-{
-	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetLoopFramePoints() : std::pair<uint64_t, uint64_t>(0, 0);
-}
-std::pair<float, float> al::ISoundChannel::GetLoopTimePoints() const
-{
-	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetLoopTimePoints() : std::pair<float, float>(0, 0);
-}
 
-float al::ISoundChannel::GetInverseFrequency() const
-{
-	auto *buf = GetBaseBuffer();
-	return (buf != nullptr) ? buf->GetInverseFrequency() : 0.f;
-}
 bool al::ISoundChannel::IsMono() const
 {
 	auto *buf = GetBaseBuffer();

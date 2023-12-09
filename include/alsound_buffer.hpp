@@ -29,11 +29,9 @@ namespace al {
 		virtual ~ISoundBuffer() override {}
 
 		virtual bool IsReady() const = 0;
-
-		virtual uint32_t GetSize() const = 0;
-		virtual void SetLoopFramePoints(uint32_t start, uint32_t end) = 0;
-		virtual void SetLoopTimePoints(float tStart, float tEnd) = 0;
-		// GetSources() ?
+		virtual double GetDuration() const = 0;
+		virtual double GetLoopPoint() const = 0;
+		virtual void SetLoopPoint(double t) = 0;
 
 		virtual std::string GetName() const = 0;
 		virtual bool IsInUse() const = 0;

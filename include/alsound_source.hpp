@@ -58,15 +58,7 @@ namespace al {
 		Decoder *GetDecoder();
 		ISoundSystem &GetSoundSystem() const;
 
-		uint32_t GetFrequency() const;
-		ChannelConfig GetChannelConfig() const;
-		SampleType GetSampleType() const;
-		uint64_t GetLength() const;
-		std::pair<uint64_t, uint64_t> GetLoopFramePoints() const;
-		std::pair<float, float> GetLoopTimePoints() const;
-
 		float GetDuration() const;
-		float GetInverseFrequency() const;
 		bool IsMono() const;
 		bool IsStereo() const;
 
@@ -81,15 +73,8 @@ namespace al {
 		virtual void SetPriority(uint32_t priority) = 0;
 		virtual uint32_t GetPriority() const = 0;
 
-		uint64_t GetFrameLength() const;
-		virtual void SetFrameOffset(uint64_t offset) = 0;
-		virtual uint64_t GetFrameOffset(uint64_t *latency = nullptr) const = 0;
-
-		void SetOffset(float offset);
-		float GetOffset() const;
-
-		void SetTimeOffset(float offset);
-		float GetTimeOffset() const;
+		virtual void SetOffset(double offset) = 0;
+		virtual double GetOffset() const = 0;
 
 		virtual void SetLooping(bool bLoop) = 0;
 		virtual bool IsLooping() const = 0;

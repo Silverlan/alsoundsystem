@@ -33,21 +33,16 @@ namespace al {
 		class DLLALSYS BufferBase {
 		  public:
 			virtual ~BufferBase() = default;
-			virtual uint32_t GetFrequency() const = 0;
-			virtual ChannelConfig GetChannelConfig() const = 0;
-			virtual SampleType GetSampleType() const = 0;
-			virtual uint64_t GetLength() const = 0;
-			virtual std::pair<uint64_t, uint64_t> GetLoopFramePoints() const = 0;
+			virtual double GetDuration() const = 0;
+			virtual double GetLoopPoint() const = 0;
+			virtual void SetLoopPoint(double t) = 0;
 
 			void SetTargetChannelConfig(ChannelConfig config);
 			ChannelConfig GetTargetChannelConfig() const;
 
-			std::pair<float, float> GetLoopTimePoints() const;
-			float GetDuration() const;
-			float GetInverseFrequency() const;
 			std::string GetFilePath() const;
 			bool IsMono() const;
-			bool IsStereo() const;
+			virtual bool IsStereo() const = 0;
 
 			void SetUserData(const std::shared_ptr<void> &userData);
 			std::shared_ptr<void> GetUserData() const;
