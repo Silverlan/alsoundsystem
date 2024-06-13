@@ -12,6 +12,7 @@
 #include "alsound_source.hpp"
 #include <sstream>
 #include <fsys/filesystem.h>
+#include <cassert>
 
 namespace al {
 #ifdef _DEBUG
