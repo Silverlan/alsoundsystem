@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "alsoundsystem.hpp"
-#include <util_sound.hpp>
 
-bool al::get_sound_duration(const std::string path, float &duration) { return util::sound::get_duration(path, duration); }
+import pragma.audio.util;
+
+bool al::get_sound_duration(const std::string path, float &duration) { return pragma::audio::util::get_duration(path, duration); }
