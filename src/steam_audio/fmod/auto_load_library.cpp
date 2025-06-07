@@ -52,7 +52,11 @@ template <typename T> T basePath(const T& path, const T& fileName)
 #if defined(_WIN32) || defined(_WIN64)
 std::string getLibraryPath()
 {
-	return util::get_program_path() +std::string{'\\'} +CORE_LIBRARY_NAME;
+    std::string absFilePath;
+    if(!filemanager::find_absolute_path(absFilePath, CORE_LIBRARY_NAME))
+        return CORE_LIBRARY_NAME;
+    ustring::replace(absFilePath, "/", "\\");
+	return absFilePath;
     /*auto module = GetModuleHandleW(PLUGIN_LIBRARY_NAME);
 
     wchar_t fileName[MAX_PATH] = { 0 };

@@ -106,7 +106,7 @@ bool ipl::Scene::DumpScene(const std::string &objFile) const
 {
 	if(m_iplScene == nullptr || IsFinalized() == false || IsComplete() == false)
 		return false;
-	auto path = FileManager::GetProgramPath() + FileManager::GetDirectorySeparator() + FileManager::GetCanonicalizedPath(objFile);
+	auto path = util::FilePath(filemanager::get_program_write_path(), objFile).GetString();
 	iplSaveSceneAsObj(m_iplScene.get(), const_cast<char *>(path.c_str()));
 	return true;
 }
