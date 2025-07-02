@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: © 2019 Silverlan <opensource@pragma-engine.com>
+// SPDX-License-Identifier: MIT
+
 #ifndef __STEAM_AUDIO_EFFECTS_HPP__
 #define __STEAM_AUDIO_EFFECTS_HPP__
 
