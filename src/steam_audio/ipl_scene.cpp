@@ -270,8 +270,7 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 
 					std::array<float, 16> m = {iplScale.x, 0.f, 0.f, 0.f, 0.f, iplScale.y, 0.f, 0.f, 0.f, 0.f, iplScale.z, 0.f, iplCenter.x, iplCenter.y, iplCenter.z, 1.f};
 					IPLhandle probeHandle = nullptr;
-					auto err = iplCreateProbeBox(
-					  iplContext, m_iplScene.get(), m.data(), probePlacementParams, [](float progress) { loadStageProgressCallback(LoadStage::GeneratingProbes, progress); }, &probeHandle);
+					auto err = iplCreateProbeBox(iplContext, m_iplScene.get(), m.data(), probePlacementParams, [](float progress) { loadStageProgressCallback(LoadStage::GeneratingProbes, progress); }, &probeHandle);
 					if(err == IPLerror::IPL_STATUS_SUCCESS)
 						m_iplProbeBoxes.push_back(std::shared_ptr<void>(probeHandle, [](IPLhandle probeHandle) { iplDestroyProbeBox(&probeHandle); }));
 					else if(errorHandler != nullptr)
@@ -291,8 +290,7 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 				probePlacementParams.heightAboveFloor = al::to_audio_distance(info.defaultHeightAboveFloor);
 
 				IPLhandle probeBox = nullptr;
-				auto err = iplCreateProbeBox(
-				  iplContext, m_iplScene.get(), m.data(), probePlacementParams, [](float progress) { loadStageProgressCallback(LoadStage::GeneratingProbes, progress); }, &probeBox);
+				auto err = iplCreateProbeBox(iplContext, m_iplScene.get(), m.data(), probePlacementParams, [](float progress) { loadStageProgressCallback(LoadStage::GeneratingProbes, progress); }, &probeBox);
 				if(err == IPLerror::IPL_STATUS_SUCCESS)
 					m_iplProbeBoxes.push_back(std::shared_ptr<void>(probeBox, [](IPLhandle probeBox) { iplDestroyProbeBox(&probeBox); }));
 				else if(errorHandler != nullptr)
