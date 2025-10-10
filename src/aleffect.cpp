@@ -6,10 +6,6 @@
 #include "alsound_auxiliaryeffectslot.hpp"
 #include "alsoundsystem.hpp"
 
-namespace al {
-	DEFINE_BASE_HANDLE(DLLALSYS, IEffect, Effect);
-};
-
 al::EffectParams::EffectParams(float pgain, float pgainHF, float pgainLF) : gain(pgain), gainHF(pgainHF), gainLF(pgainLF) {}
 
 /////////////////////

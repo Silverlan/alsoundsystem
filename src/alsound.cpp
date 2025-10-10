@@ -9,10 +9,6 @@
 #include "alsoundsystem.hpp"
 #include "alsound_coordinate_system.hpp"
 
-namespace al {
-	DEFINE_BASE_HANDLE(DLLALSYS, SoundSource, SoundSource);
-};
-
 al::ISoundChannel::ISoundChannel(ISoundSystem &system, Decoder &decoder)
     : m_system(system), m_decoder(std::static_pointer_cast<Decoder>(decoder.shared_from_this()))
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1

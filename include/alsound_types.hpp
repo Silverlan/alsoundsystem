@@ -5,7 +5,7 @@
 #define __ALSOUND_ENUMS_HPP__
 
 #include "alsound_definitions.hpp"
-#include <sharedutils/def_handle.h>
+#include "sharedutils/util_shared_handle.hpp"
 #include <functional>
 #include <array>
 #include <mathutil/umath.h>
@@ -30,8 +30,8 @@ namespace al {
 
 	using SoundSourceFactory = std::function<PSoundSource(const PSoundChannel &)>;
 
-	DECLARE_BASE_HANDLE(DLLALSYS, IEffect, Effect);
-	DECLARE_BASE_HANDLE(DLLALSYS, SoundSource, SoundSource);
+	using EffectHandle = util::TSharedHandle<IEffect>;
+	using SoundSourceHandle = util::TSharedHandle<SoundSource>;
 
 	struct DLLALSYS EffectParams {
 		EffectParams(float gain = 1.f, float gainHF = 1.f, float gainLF = 1.f);

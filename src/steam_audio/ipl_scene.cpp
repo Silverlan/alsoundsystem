@@ -17,7 +17,7 @@
 //#include <material.h>
 //#include <c_game.h>
 //#include <raytraces.h>
-//extern DLLCLIENT CGame *c_game;
+//extern CGame *c_game;
 ipl::Scene::FinalizeData::FinalizeData() {}
 ipl::Scene::FinalizeData::~FinalizeData() { Stop(); }
 void ipl::Scene::FinalizeData::Stop()

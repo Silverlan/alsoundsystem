@@ -7,7 +7,6 @@
 #include "alsound_definitions.hpp"
 #include "alsound_types.hpp"
 #include "impl_alsound_source_handle.hpp"
-#include <sharedutils/def_handle.h>
 #include <memory>
 
 #pragma warning(push)
