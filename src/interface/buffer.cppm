@@ -5,7 +5,7 @@ module;
 
 #include "definitions.hpp"
 
-export module pragma.alsoundsystem:buffer;
+export module pragma.soundsystem:buffer;
 
 export import :buffer_base;
 export import :types;

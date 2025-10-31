@@ -5,7 +5,7 @@
 
 module;
 
-module pragma.alsoundsystem;
+module pragma.soundsystem;
 
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #include "alsound_definitions.hpp"

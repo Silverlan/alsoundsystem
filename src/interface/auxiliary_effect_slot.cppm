@@ -5,7 +5,7 @@ module;
 
 #include "definitions.hpp"
 
-export module pragma.alsoundsystem:auxiliary_effect_slot;
+export module pragma.soundsystem:auxiliary_effect_slot;
 
 export import std;
 

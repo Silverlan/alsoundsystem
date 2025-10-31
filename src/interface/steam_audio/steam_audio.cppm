@@ -9,7 +9,7 @@ module;
 #include <phonon.h>
 #endif
 
-export module pragma.alsoundsystem:steam_audio.core;
+export module pragma.soundsystem:steam_audio.core;
 
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 

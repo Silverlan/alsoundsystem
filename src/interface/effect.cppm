@@ -5,7 +5,7 @@ module;
 
 #include "definitions.hpp"
 
-export module pragma.alsoundsystem:effect;
+export module pragma.soundsystem:effect;
 
 export import :types;
 

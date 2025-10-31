@@ -5,7 +5,7 @@ module;
 
 #include "definitions.hpp"
 
-export module pragma.alsoundsystem:coordinate_system;
+export module pragma.soundsystem:coordinate_system;
 
 export import pragma.util;
 

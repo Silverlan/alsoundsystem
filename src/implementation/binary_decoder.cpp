@@ -3,7 +3,7 @@
 
 module;
 
-module pragma.alsoundsystem;
+module pragma.soundsystem;
 
 import :binary_decoder;
 

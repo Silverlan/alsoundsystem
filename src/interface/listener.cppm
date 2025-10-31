@@ -5,7 +5,7 @@ module;
 
 #include "definitions.hpp"
 
-export module pragma.alsoundsystem:listener;
+export module pragma.soundsystem:listener;
 
 export import pragma.math;
 

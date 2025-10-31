@@ -9,7 +9,7 @@ module;
 #include <alure2.h>
 #endif
 
-export module pragma.alsoundsystem:binary_decoder;
+export module pragma.soundsystem:binary_decoder;
 
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE && ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 export {

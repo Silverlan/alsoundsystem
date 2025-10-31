@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: (c) 2019 Silverlan <opensource@pragma-engine.com>
 // SPDX-License-Identifier: MIT
 
-module pragma.alsoundsystem;
+module pragma.soundsystem;
 
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 void al::SoundSource::InitializeSteamAudio()

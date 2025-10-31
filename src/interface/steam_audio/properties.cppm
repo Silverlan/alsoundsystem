@@ -5,7 +5,7 @@ module;
 
 #include "definitions.hpp"
 
-export module pragma.alsoundsystem:steam_audio.properties;
+export module pragma.soundsystem:steam_audio.properties;
 
 export import pragma.util;
 
