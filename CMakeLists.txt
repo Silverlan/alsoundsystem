@@ -10,8 +10,8 @@ pr_add_dependency(${PROJ_NAME} ogg TARGET)
 pr_add_dependency(${PROJ_NAME} vorbis TARGET)
 pr_add_dependency(${PROJ_NAME} vorbisfile TARGET LINK_ONLY)
 
+pr_init_module(${PROJ_NAME})
 pr_add_headers(${PROJ_NAME} "include/")
-pr_add_sources(${PROJ_NAME} "src/")
 
 pr_add_compile_definitions(
 	${PROJ_NAME}
