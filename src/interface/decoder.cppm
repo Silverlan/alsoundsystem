@@ -15,13 +15,13 @@ export namespace al {
 	class SoundSystem;
 	class DLLALSYS Decoder : public impl::BufferBase, public std::enable_shared_from_this<Decoder> {
 	  public:
-		~Decoder();
+		~Decoder() {}
 
-		virtual double GetDuration() const override;
-		virtual double GetLoopPoint() const override;
-		virtual void SetLoopPoint(double t) override;
+		virtual double GetDuration() const override { return 0.0; }
+		virtual double GetLoopPoint() const override { return 0.0; }
+		virtual void SetLoopPoint(double t) override {}
 
-		bool Seek(uint64_t frame);
+		bool Seek(uint64_t frame) {}
 	  private:
 		friend SoundSystem;
 
