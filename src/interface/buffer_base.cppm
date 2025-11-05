@@ -29,7 +29,7 @@ export {
 			using namespace umath::scoped_enum::bitwise;
 
 			class DLLALSYS BufferBase {
-			public:
+			  public:
 				virtual ~BufferBase() = default;
 				virtual double GetDuration() const = 0;
 				virtual double GetLoopPoint() const = 0;
@@ -44,7 +44,7 @@ export {
 
 				void SetUserData(const std::shared_ptr<void> &userData);
 				std::shared_ptr<void> GetUserData() const;
-			protected:
+			  protected:
 				BufferBase(const std::string &path = "");
 				std::string m_filePath;
 				std::shared_ptr<void> m_userData = nullptr;

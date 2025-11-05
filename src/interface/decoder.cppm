@@ -25,7 +25,7 @@ export namespace al {
 	  private:
 		friend SoundSystem;
 
-	  /*public:
+		/*public:
 		const std::shared_ptr<alure::Decoder> &GetALDecoder() const;
 		std::shared_ptr<alure::Decoder> &GetALDecoder();
 	  private:

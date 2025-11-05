@@ -18,7 +18,7 @@ export {
 	};
 	namespace al {
 		class DLLALSYS BinaryDecoder : public alure::Decoder {
-		public:
+		  public:
 			BinaryDecoder(std::shared_ptr<ipl::AudioDataBuffer> &audioDataBuffer);
 			virtual ~BinaryDecoder() override;
 			virtual ALuint getFrequency() const override;
@@ -29,7 +29,7 @@ export {
 			virtual bool seek(uint64_t pos) override;
 			virtual std::pair<uint64_t, uint64_t> getLoopPoints() const override;
 			virtual ALuint read(ALvoid *ptr, ALuint count) override;
-		protected:
+		  protected:
 			uint64_t m_offset = 0ull;
 			std::shared_ptr<ipl::AudioDataBuffer> m_audioDataBuffer = nullptr;
 		};
