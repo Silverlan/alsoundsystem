@@ -21,7 +21,7 @@ export namespace al {
 		virtual double GetLoopPoint() const override { return 0.0; }
 		virtual void SetLoopPoint(double t) override {}
 
-		bool Seek(uint64_t frame) {}
+		bool Seek(uint64_t frame) { return false; }
 	  private:
 		friend SoundSystem;
 
