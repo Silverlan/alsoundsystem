@@ -1,9 +1,11 @@
 // SPDX-FileCopyrightText: (c) 2019 Silverlan <opensource@pragma-engine.com>
 // SPDX-License-Identifier: MIT
 
-module pragma.soundsystem;
+module;
 
 #include <cassert>
+
+module pragma.soundsystem;
 
 import :source;
 import :system;
