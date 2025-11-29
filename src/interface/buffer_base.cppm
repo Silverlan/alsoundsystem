@@ -4,6 +4,7 @@
 module;
 
 #include "definitions.hpp"
+#include "util_enum_flags.hpp"
 
 export module pragma.soundsystem:buffer_base;
 
@@ -57,9 +58,6 @@ export {
 		};
 	};
 
-	namespace umath::scoped_enum::bitwise {
-		template<>
-		struct enable_bitwise_operators<al::impl::BufferLoadData::Flags> : std::true_type {};
-	}
+	REGISTER_ENUM_FLAGS(al::impl::BufferLoadData::Flags)
 }
 #pragma warning(pop)

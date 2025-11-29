@@ -4,6 +4,7 @@
 module;
 
 #include "definitions.hpp"
+#include "util_enum_flags.hpp"
 
 export module pragma.soundsystem:system;
 
@@ -177,10 +178,7 @@ export namespace al {
 };
 
 export {
-	namespace umath::scoped_enum::bitwise {
-		template<>
-		struct enable_bitwise_operators<al::ISoundSystem::GlobalEffectFlag> : std::true_type {};
-	}
+	REGISTER_ENUM_FLAGS(al::ISoundSystem::GlobalEffectFlag)
 }
 
 #pragma warning(pop)
