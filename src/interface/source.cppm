@@ -221,8 +221,9 @@ export namespace al {
 
 	class DLLALSYS SoundSource {
 	  public:
-		SoundSource(const std::shared_ptr<ISoundChannel> &channel);
+		static std::shared_ptr<SoundSource> Create(const std::shared_ptr<ISoundChannel> &channel);
 		virtual ~SoundSource();
+		void InitializeHandle(const std::shared_ptr<SoundSource> &ptr);
 		SoundSourceHandle GetHandle() const;
 
 		virtual void Update() { return (*this)->Update(); }
@@ -235,6 +236,8 @@ export namespace al {
 		const ISoundChannel *operator->() const { return &GetChannel(); }
 		ISoundChannel &operator*() { return GetChannel(); }
 		const ISoundChannel &operator*() const { return GetChannel(); }
+	protected:
+		SoundSource(const std::shared_ptr<ISoundChannel> &channel);
 	  private:
 		std::shared_ptr<ISoundChannel> m_channel = nullptr;
 		mutable SoundSourceHandle m_handle = {};

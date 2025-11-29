@@ -269,8 +269,21 @@ bool al::ISoundChannel::IsStereo() const
 
 ////////
 
-al::SoundSource::SoundSource(const std::shared_ptr<ISoundChannel> &channel) : m_channel {channel}, m_handle {this} {}
-al::SoundSource::~SoundSource() { m_handle.Invalidate(); }
+std::shared_ptr<al::SoundSource> al::SoundSource::Create(const std::shared_ptr<ISoundChannel> &channel) {
+	auto snd = std::shared_ptr<al::SoundSource> {new al::SoundSource {channel}, [](al::SoundSource *snd) {
+		snd->OnRelease();
+		delete snd;
+	}};
+	snd->InitializeHandle(snd);
+	return snd;
+}
+al::SoundSource::SoundSource(const std::shared_ptr<ISoundChannel> &channel) : m_channel {channel} {}
+al::SoundSource::~SoundSource() {
+	m_handle.Invalidate();
+}
+void al::SoundSource::InitializeHandle(const std::shared_ptr<SoundSource> &ptr) {
+	m_handle = util::to_shared_handle<SoundSource>(ptr);
+}
 al::SoundSourceHandle al::SoundSource::GetHandle() const { return m_handle; }
 
 void al::SoundSource::OnRelease() { m_channel->GetSoundSystem().OnSoundRelease(*this); }

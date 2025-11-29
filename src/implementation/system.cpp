@@ -223,10 +223,7 @@ static bool apply_steam_audio_processing(ipl::Scene &scene, al::impl::BufferLoad
 al::ISoundSystem::ISoundSystem(float metersPerUnit) : m_metersPerUnit {metersPerUnit}
 {
 	SetSoundSourceFactory([](const PSoundChannel &channel) -> PSoundSource {
-		return std::shared_ptr<al::SoundSource> {new al::SoundSource {channel}, [](al::SoundSource *snd) {
-			                                         snd->OnRelease();
-			                                         delete snd;
-		                                         }};
+		return al::SoundSource::Create(channel);
 	});
 }
 
