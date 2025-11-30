@@ -274,16 +274,13 @@ std::shared_ptr<al::SoundSource> al::SoundSource::Create(const std::shared_ptr<I
 		snd->OnRelease();
 		delete snd;
 	}};
-	snd->InitializeHandle(snd);
 	return snd;
 }
 al::SoundSource::SoundSource(const std::shared_ptr<ISoundChannel> &channel) : m_channel {channel} {}
-al::SoundSource::~SoundSource() {
-	m_handle.Invalidate();
+al::SoundSource::~SoundSource() {}
+void al::SoundSource::InitializeHandle(const util::TSharedHandle<SoundSource> &ptr) {
+	m_handle = ptr;
 }
-void al::SoundSource::InitializeHandle(const std::shared_ptr<SoundSource> &ptr) {
-	m_handle = util::to_shared_handle<SoundSource>(ptr);
-}
-al::SoundSourceHandle al::SoundSource::GetHandle() const { return m_handle; }
+al::SoundSourceHandle al::SoundSource::GetHandle() const { return util::claim_shared_handle_ownership(m_handle); }
 
 void al::SoundSource::OnRelease() { m_channel->GetSoundSystem().OnSoundRelease(*this); }

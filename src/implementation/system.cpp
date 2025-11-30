@@ -289,7 +289,8 @@ al::PSoundSource al::ISoundSystem::InitializeSource(const std::shared_ptr<ISound
 	auto psource = m_soundSourceFactory ? m_soundSourceFactory(channel) : nullptr;
 	if(!psource)
 		return nullptr;
-	m_sources.push_back(psource);
+	m_sources.push_back(util::to_shared_handle(psource));
+	psource->InitializeHandle(m_sources.back());
 	ApplyGlobalEffects(*psource);
 
 	//auto *decoder = source->GetDecoder();
@@ -366,8 +367,8 @@ al::PSoundSource al::ISoundSystem::CreateSource(const std::string &name, bool bS
 	return nullptr; // FMOD TODO
 #endif
 }
-const std::vector<al::PSoundSource> &al::ISoundSystem::GetSources() const { return const_cast<ISoundSystem *>(this)->GetSources(); }
-std::vector<al::PSoundSource> &al::ISoundSystem::GetSources() { return m_sources; }
+const std::vector<al::SoundSourceHandle> &al::ISoundSystem::GetSources() const { return const_cast<ISoundSystem *>(this)->GetSources(); }
+std::vector<al::SoundSourceHandle> &al::ISoundSystem::GetSources() { return m_sources; }
 
 al::PSoundSource al::ISoundSystem::CreateSource(ISoundBuffer &buffer)
 {

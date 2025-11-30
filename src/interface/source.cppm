@@ -223,7 +223,7 @@ export namespace al {
 	  public:
 		static std::shared_ptr<SoundSource> Create(const std::shared_ptr<ISoundChannel> &channel);
 		virtual ~SoundSource();
-		void InitializeHandle(const std::shared_ptr<SoundSource> &ptr);
+		void InitializeHandle(const util::TSharedHandle<SoundSource> &ptr);
 		SoundSourceHandle GetHandle() const;
 
 		virtual void Update() { return (*this)->Update(); }
@@ -240,7 +240,7 @@ export namespace al {
 		SoundSource(const std::shared_ptr<ISoundChannel> &channel);
 	  private:
 		std::shared_ptr<ISoundChannel> m_channel = nullptr;
-		mutable SoundSourceHandle m_handle = {};
+		mutable util::TWeakSharedHandle<SoundSource> m_handle = {};
 	};
 	using PSoundSource = std::shared_ptr<SoundSource>;
 	using WPSoundSource = std::weak_ptr<SoundSource>;

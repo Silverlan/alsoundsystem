@@ -41,8 +41,8 @@ export namespace al {
 		PSoundSource CreateSource(ISoundBuffer &buffer);
 		PSoundSource CreateSource(Decoder &decoder);
 		PSoundSource CreateSource(const std::string &name, bool bStereo, Type type = Type::Buffer);
-		const std::vector<PSoundSource> &GetSources() const;
-		std::vector<PSoundSource> &GetSources();
+		const std::vector<SoundSourceHandle> &GetSources() const;
+		std::vector<SoundSourceHandle> &GetSources();
 		void StopSounds();
 
 		std::vector<ISoundBuffer *> GetBuffers() const;
@@ -124,7 +124,7 @@ export namespace al {
 		PSoundSource InitializeSource(const std::shared_ptr<ISoundChannel> &channel);
 		virtual std::unique_ptr<IListener> CreateListener() = 0;
 		std::unique_ptr<IListener> m_listener;
-		std::vector<PSoundSource> m_sources;
+		std::vector<SoundSourceHandle> m_sources;
 
 		struct BufferCache {
 			PSoundBuffer mono = nullptr;
