@@ -6,19 +6,19 @@ module pragma.soundsystem;
 import :effect;
 import :source;
 
-al::EffectParams::EffectParams(float pgain, float pgainHF, float pgainLF) : gain(pgain), gainHF(pgainHF), gainLF(pgainLF) {}
+pragma::audio::EffectParams::EffectParams(float pgain, float pgainHF, float pgainLF) : gain(pgain), gainHF(pgainHF), gainLF(pgainLF) {}
 
 /////////////////////
 
-al::IEffect::IEffect(ISoundSystem &soundSys) : m_soundSystem {soundSys} {}
-al::IEffect::~IEffect()
+pragma::audio::IEffect::IEffect(ISoundSystem &soundSys) : m_soundSystem {soundSys} {}
+pragma::audio::IEffect::~IEffect()
 {
 	if(m_handle.IsValid())
 		m_handle.Invalidate();
 }
 
-al::EffectHandle al::IEffect::GetHandle() const { return m_handle; }
-void al::IEffect::Release()
+pragma::audio::EffectHandle pragma::audio::IEffect::GetHandle() const { return m_handle; }
+void pragma::audio::IEffect::Release()
 {
 	while(m_attachedSources.empty() == false)
 		DetachSource(m_attachedSources.front()->GetChannel());

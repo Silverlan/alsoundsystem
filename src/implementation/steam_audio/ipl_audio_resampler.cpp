@@ -11,7 +11,7 @@ module pragma.soundsystem;
 ipl::AudioResampler::AudioResampler(uint32_t inputFrequency, uint64_t inputLength, uint32_t outputFrequency)
 {
 	auto srcRatio = outputFrequency / static_cast<float>(inputFrequency);
-	auto outputLength = umath::ceil(srcRatio * inputLength);
+	auto outputLength = pragma::math::ceil(srcRatio * inputLength);
 	m_outputData.resize(outputLength);
 
 	int err;

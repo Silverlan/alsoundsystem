@@ -16,7 +16,7 @@ export {
 	namespace ipl {
 		struct AudioDataBuffer;
 	};
-	namespace al {
+	namespace pragma::audio {
 		class SoundSystem;
 		namespace impl {
 			struct BufferLoadData {
@@ -27,7 +27,7 @@ export {
 				std::shared_ptr<void> userData = nullptr;
 				std::weak_ptr<ipl::AudioDataBuffer> buffer = {};
 			};
-			using namespace umath::scoped_enum::bitwise;
+			using namespace pragma::math::scoped_enum::bitwise;
 
 			class DLLALSYS BufferBase {
 			  public:
@@ -58,6 +58,6 @@ export {
 		};
 	};
 
-	REGISTER_ENUM_FLAGS(al::impl::BufferLoadData::Flags)
+	REGISTER_ENUM_FLAGS(pragma::audio::impl::BufferLoadData::Flags)
 }
 #pragma warning(pop)

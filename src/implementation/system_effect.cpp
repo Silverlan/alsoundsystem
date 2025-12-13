@@ -6,13 +6,13 @@ module pragma.soundsystem;
 import :source;
 import :system;
 
-al::ISoundSystem::GlobalEffect::SoundInfo::~SoundInfo()
+pragma::audio::ISoundSystem::GlobalEffect::SoundInfo::~SoundInfo()
 {
 	if(relativeCallback.IsValid())
 		relativeCallback.Remove();
 }
 
-void al::ISoundSystem::ApplyGlobalEffect(SoundSource &source, GlobalEffect &globalEffect)
+void pragma::audio::ISoundSystem::ApplyGlobalEffect(SoundSource &source, GlobalEffect &globalEffect)
 {
 	auto bApply = false;
 	if(source->IsRelative() == true) {
@@ -42,14 +42,14 @@ void al::ISoundSystem::ApplyGlobalEffect(SoundSource &source, GlobalEffect &glob
 	}
 	info->slotId = slotId;
 }
-void al::ISoundSystem::ApplyGlobalEffects(SoundSource &source)
+void pragma::audio::ISoundSystem::ApplyGlobalEffects(SoundSource &source)
 {
 	for(auto &pair : m_globalEffects) {
 		auto &globalEffect = pair.second;
 		ApplyGlobalEffect(source, globalEffect);
 	}
 }
-uint32_t al::ISoundSystem::AddGlobalEffect(IEffect &effect, GlobalEffectFlag flags, const EffectParams &params)
+uint32_t pragma::audio::ISoundSystem::AddGlobalEffect(IEffect &effect, GlobalEffectFlag flags, const EffectParams &params)
 {
 	if((flags & GlobalEffectFlag::RelativeSounds) == GlobalEffectFlag::None && (flags & GlobalEffectFlag::WorldSounds) == GlobalEffectFlag::None)
 		return std::numeric_limits<uint32_t>::max();
@@ -71,7 +71,7 @@ uint32_t al::ISoundSystem::AddGlobalEffect(IEffect &effect, GlobalEffectFlag fla
 		ApplyGlobalEffect(*hSrc.get(), globalEffect);
 	return slotId;
 }
-void al::ISoundSystem::RemoveGlobalEffect(GlobalEffect &globalEffect)
+void pragma::audio::ISoundSystem::RemoveGlobalEffect(GlobalEffect &globalEffect)
 {
 	for(auto &info : globalEffect.sourceInfo) {
 		auto &hSnd = info->source;
@@ -80,7 +80,7 @@ void al::ISoundSystem::RemoveGlobalEffect(GlobalEffect &globalEffect)
 		(*hSnd.get())->RemoveEffect(info->slotId);
 	}
 }
-void al::ISoundSystem::RemoveGlobalEffect(IEffect &effect)
+void pragma::audio::ISoundSystem::RemoveGlobalEffect(IEffect &effect)
 {
 	auto it = std::find_if(m_globalEffects.begin(), m_globalEffects.end(), [&effect](const std::pair<uint32_t, GlobalEffect> &pair) { return (pair.second.effect == &effect) ? true : false; });
 	if(it == m_globalEffects.end())
@@ -89,7 +89,7 @@ void al::ISoundSystem::RemoveGlobalEffect(IEffect &effect)
 	RemoveGlobalEffect(it->second);
 	m_globalEffects.erase(it);
 }
-void al::ISoundSystem::RemoveGlobalEffect(uint32_t slotId)
+void pragma::audio::ISoundSystem::RemoveGlobalEffect(uint32_t slotId)
 {
 	auto it = m_globalEffects.find(slotId);
 	if(it == m_globalEffects.end())
@@ -98,7 +98,7 @@ void al::ISoundSystem::RemoveGlobalEffect(uint32_t slotId)
 	RemoveGlobalEffect(it->second);
 	m_globalEffects.erase(it);
 }
-void al::ISoundSystem::SetGlobalEffectParameters(GlobalEffect &globalEffect, const EffectParams &params)
+void pragma::audio::ISoundSystem::SetGlobalEffectParameters(GlobalEffect &globalEffect, const EffectParams &params)
 {
 	globalEffect.params = params;
 	for(auto &info : globalEffect.sourceInfo) {
@@ -108,14 +108,14 @@ void al::ISoundSystem::SetGlobalEffectParameters(GlobalEffect &globalEffect, con
 		(*hSnd.get())->SetEffectParameters(info->slotId, params);
 	}
 }
-void al::ISoundSystem::SetGlobalEffectParameters(IEffect &effect, const EffectParams &params)
+void pragma::audio::ISoundSystem::SetGlobalEffectParameters(IEffect &effect, const EffectParams &params)
 {
 	auto it = std::find_if(m_globalEffects.begin(), m_globalEffects.end(), [&effect](const std::pair<uint32_t, GlobalEffect> &pair) { return (pair.second.effect == &effect) ? true : false; });
 	if(it == m_globalEffects.end())
 		return;
 	SetGlobalEffectParameters(it->second, params);
 }
-void al::ISoundSystem::SetGlobalEffectParameters(uint32_t slotId, const EffectParams &params)
+void pragma::audio::ISoundSystem::SetGlobalEffectParameters(uint32_t slotId, const EffectParams &params)
 {
 	auto it = m_globalEffects.find(slotId);
 	if(it == m_globalEffects.end())

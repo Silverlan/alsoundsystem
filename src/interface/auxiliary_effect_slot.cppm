@@ -11,7 +11,7 @@ export import std;
 
 #pragma warning(push)
 #pragma warning(disable : 4251)
-export namespace al {
+export namespace pragma::audio {
 	class ISoundSystem;
 	class IEffect;
 	class DLLALSYS IAuxiliaryEffectSlot {

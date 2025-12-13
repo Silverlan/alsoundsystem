@@ -11,7 +11,7 @@ export import :types;
 
 #pragma warning(push)
 #pragma warning(disable : 4251)
-export namespace al {
+export namespace pragma::audio {
 	enum class VocalMorpherPhoneme : uint32_t { A = 0, E, I, O, U, AA, AE, AH, AO, EH, ER, IH, IY, UH, UW, B, D, F, G, J, K, L, M, N, P, R, S, T, V, Z };
 
 	enum class Waveform : uint32_t {
@@ -136,18 +136,18 @@ export namespace al {
 	  public:
 		virtual ~IEffect();
 
-		virtual void SetProperties(al::EfxEaxReverbProperties props) = 0;
-		virtual void SetProperties(al::EfxChorusProperties props) = 0;
-		virtual void SetProperties(al::EfxDistortionProperties props) = 0;
-		virtual void SetProperties(al::EfxEchoProperties props) = 0;
-		virtual void SetProperties(al::EfxFlangerProperties props) = 0;
-		virtual void SetProperties(al::EfxFrequencyShifterProperties props) = 0;
-		virtual void SetProperties(al::EfxVocalMorpherProperties props) = 0;
-		virtual void SetProperties(al::EfxPitchShifterProperties props) = 0;
-		virtual void SetProperties(al::EfxRingModulatorProperties props) = 0;
-		virtual void SetProperties(al::EfxAutoWahProperties props) = 0;
-		virtual void SetProperties(al::EfxCompressor props) = 0;
-		virtual void SetProperties(al::EfxEqualizer props) = 0;
+		virtual void SetProperties(EfxEaxReverbProperties props) = 0;
+		virtual void SetProperties(EfxChorusProperties props) = 0;
+		virtual void SetProperties(EfxDistortionProperties props) = 0;
+		virtual void SetProperties(EfxEchoProperties props) = 0;
+		virtual void SetProperties(EfxFlangerProperties props) = 0;
+		virtual void SetProperties(EfxFrequencyShifterProperties props) = 0;
+		virtual void SetProperties(EfxVocalMorpherProperties props) = 0;
+		virtual void SetProperties(EfxPitchShifterProperties props) = 0;
+		virtual void SetProperties(EfxRingModulatorProperties props) = 0;
+		virtual void SetProperties(EfxAutoWahProperties props) = 0;
+		virtual void SetProperties(EfxCompressor props) = 0;
+		virtual void SetProperties(EfxEqualizer props) = 0;
 
 		void Release();
 		EffectHandle GetHandle() const;

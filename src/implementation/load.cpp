@@ -6,9 +6,9 @@ module pragma.soundsystem;
 import :system;
 import pragma.filesystem;
 
-al::ISoundBuffer *al::ISoundSystem::LoadSound(const std::string &path, bool bConvertToMono, bool bAsync)
+pragma::audio::ISoundBuffer *pragma::audio::ISoundSystem::LoadSound(const std::string &path, bool bConvertToMono, bool bAsync)
 {
-	auto normPath = FileManager::GetNormalizedPath(path);
+	auto normPath = pragma::fs::get_normalized_path(path);
 
 	auto it = m_buffers.find(normPath);
 	if(it != m_buffers.end()) {
@@ -21,9 +21,9 @@ al::ISoundBuffer *al::ISoundSystem::LoadSound(const std::string &path, bool bCon
 	return DoLoadSound(normPath, bConvertToMono, bAsync);
 }
 
-al::ISoundBuffer *al::ISoundSystem::GetBuffer(const std::string &path, bool bStereo)
+pragma::audio::ISoundBuffer *pragma::audio::ISoundSystem::GetBuffer(const std::string &path, bool bStereo)
 {
-	auto normPath = FileManager::GetNormalizedPath(path);
+	auto normPath = pragma::fs::get_normalized_path(path);
 	auto it = m_buffers.find(normPath);
 	if(it == m_buffers.end())
 		return nullptr;

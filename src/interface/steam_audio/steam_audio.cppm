@@ -80,7 +80,7 @@ export namespace ipl {
 		const std::shared_ptr<Context> &GetContext() const;
 		// Function callbacks are called from processing thread
 		void Finalize(const FinalizeInfo &info = {}, const std::function<void(LoadStage, float)> &fStageProgress = nullptr, const std::function<void(void)> &fOnComplete = nullptr, const std::function<void(IPLerror)> &errorHandler = nullptr);
-		void Finalize(const std::shared_ptr<VFilePtrInternal> &f, const FinalizeInfo &info = {}, const std::function<void(LoadStage, float)> &fStageProgress = nullptr, const std::function<void(void)> &fOnComplete = nullptr, const std::function<void(IPLerror)> &errorHandler = nullptr);
+		void Finalize(const std::shared_ptr<fs::VFilePtrInternal> &f, const FinalizeInfo &info = {}, const std::function<void(LoadStage, float)> &fStageProgress = nullptr, const std::function<void(void)> &fOnComplete = nullptr, const std::function<void(IPLerror)> &errorHandler = nullptr);
 		const std::vector<std::shared_ptr<StaticMesh>> &GetStaticMeshes() const;
 		std::shared_ptr<StaticMesh> CreateStaticMesh(const std::vector<IPLVector3> &verts = {}, const std::vector<IPLTriangle> &triangles = {}, const std::vector<IPLint32> &materialIndices = {});
 		void AddProbeBox(const Vector3 &min, const Vector3 &max, float spacing = 512.f, float heightAboveFloor = 50.f);
@@ -106,8 +106,8 @@ export namespace ipl {
 		bool IsPropagationDelayEnabled() const;
 		void SetPropagationDelayEnabled(bool b);
 
-		void Save(std::shared_ptr<VFilePtrInternalReal> &f, bool bSaveProbeBoxes = true) const;
-		IPLerror Load(const std::shared_ptr<VFilePtrInternal> &f, IPLLoadSceneProgressCallback callback = nullptr);
+		void Save(std::shared_ptr<fs::VFilePtrInternalReal> &f, bool bSaveProbeBoxes = true) const;
+		IPLerror Load(const std::shared_ptr<fs::VFilePtrInternal> &f, IPLLoadSceneProgressCallback callback = nullptr);
 		bool IsComplete() const;
 
 		void GetProbeSpheres(std::vector<ProbeSphere> &spheres);

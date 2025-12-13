@@ -11,7 +11,7 @@ export import pragma.math;
 
 #pragma warning(push)
 #pragma warning(disable : 4251)
-export namespace al {
+export namespace pragma::audio {
 	class ISoundSystem;
 	class DLLALSYS IListener {
 	  public:
@@ -32,10 +32,10 @@ export namespace al {
 		float GetMetersPerUnit() const;
 		void SetMetersPerUnit(float mu);
 	  protected:
-		IListener(al::ISoundSystem &system);
+		IListener(ISoundSystem &system);
 		virtual void DoSetMetersPerUnit(float mu) = 0;
 
-		al::ISoundSystem &m_soundSystem;
+		ISoundSystem &m_soundSystem;
 		float m_gain = 1.f;
 		Vector3 m_position = {};
 		Vector3 m_velocity = {};

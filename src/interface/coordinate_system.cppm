@@ -10,7 +10,7 @@ export module pragma.soundsystem:coordinate_system;
 export import pragma.util;
 
 export {
-	namespace al {
+	namespace pragma::audio {
 		DLLALSYS void set_world_scale(float scale);
 		DLLALSYS Vector3 to_audio_direction(const Vector3 &v);
 		DLLALSYS Vector3 to_audio_position(const Vector3 &v);
@@ -30,12 +30,12 @@ export {
 	};
 
 	template<class T>
-	T al::to_custom_vector(const Vector3 &v)
+	T pragma::audio::to_custom_vector(const Vector3 &v)
 	{
 		return T {v.x, v.y, v.z};
 	}
 	template<class T>
-	Vector3 al::to_game_vector(const T &v)
+	Vector3 pragma::audio::to_game_vector(const T &v)
 	{
 		return Vector3 {v.x, v.y, v.z};
 	}

@@ -15,7 +15,7 @@ export import std.compat;
 
 #pragma warning(push)
 #pragma warning(disable : 4251)
-export namespace al {
+export namespace pragma::audio {
 	class DLLALSYS ISoundSystem {
 	  public:
 		enum class GlobalEffectFlag : uint32_t { None = 0, RelativeSounds = 1, WorldSounds = RelativeSounds << 1, All = RelativeSounds | WorldSounds };
@@ -105,12 +105,12 @@ export namespace al {
 		steam_audio::Properties &GetSteamAudioProperties();
 		void SetSteamAudioSpatializerEnabled(bool b);
 		void SetSteamAudioReverbEnabled(bool b);
-		util::Overridable<bool> &GetSteamAudioSpatializerEnabled();
-		util::Overridable<bool> &GetSteamAudioReverbEnabled();
+		pragma::util::Overridable<bool> &GetSteamAudioSpatializerEnabled();
+		pragma::util::Overridable<bool> &GetSteamAudioReverbEnabled();
 	  private:
 		steam_audio::Properties m_steamAudioProperties = {};
-		util::Overridable<bool> m_bSteamAudioSpatializerEnabled = false;
-		util::Overridable<bool> m_bSteamAudioReverbEnabled = false;
+		pragma::util::Overridable<bool> m_bSteamAudioSpatializerEnabled = false;
+		pragma::util::Overridable<bool> m_bSteamAudioReverbEnabled = false;
 #endif
 
 		// Internal use only
@@ -178,7 +178,7 @@ export namespace al {
 };
 
 export {
-	REGISTER_ENUM_FLAGS(al::ISoundSystem::GlobalEffectFlag)
+	REGISTER_ENUM_FLAGS(pragma::audio::ISoundSystem::GlobalEffectFlag)
 }
 
 #pragma warning(pop)

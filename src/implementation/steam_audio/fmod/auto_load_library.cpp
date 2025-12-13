@@ -56,7 +56,7 @@ std::string getLibraryPath()
     std::string absFilePath;
     if(!filemanager::find_absolute_path(absFilePath, CORE_LIBRARY_NAME))
         return CORE_LIBRARY_NAME;
-    ustring::replace(absFilePath, "/", "\\");
+    pragma::string::replace(absFilePath, "/", "\\");
 	return absFilePath;
     /*auto module = GetModuleHandleW(PLUGIN_LIBRARY_NAME);
 

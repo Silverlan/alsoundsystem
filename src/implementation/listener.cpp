@@ -5,19 +5,19 @@ module pragma.soundsystem;
 
 import :listener;
 
-al::IListener::IListener(al::ISoundSystem &system) : m_soundSystem(system) {}
+pragma::audio::IListener::IListener(ISoundSystem &system) : m_soundSystem(system) {}
 
-void al::IListener::SetGain(float gain) { m_gain = gain; }
-float al::IListener::GetGain() const { return m_gain; }
+void pragma::audio::IListener::SetGain(float gain) { m_gain = gain; }
+float pragma::audio::IListener::GetGain() const { return m_gain; }
 
-void al::IListener::SetPosition(const Vector3 &pos) { m_position = pos; }
-const Vector3 &al::IListener::GetPosition() const { return m_position; }
+void pragma::audio::IListener::SetPosition(const Vector3 &pos) { m_position = pos; }
+const Vector3 &pragma::audio::IListener::GetPosition() const { return m_position; }
 
-void al::IListener::SetVelocity(const Vector3 &vel) { m_velocity = vel; }
-const Vector3 &al::IListener::GetVelocity() const { return m_velocity; }
+void pragma::audio::IListener::SetVelocity(const Vector3 &vel) { m_velocity = vel; }
+const Vector3 &pragma::audio::IListener::GetVelocity() const { return m_velocity; }
 
-void al::IListener::SetOrientation(const Vector3 &at, const Vector3 &up) { m_orientation = {at, up}; }
-const std::pair<Vector3, Vector3> &al::IListener::GetOrientation() const { return m_orientation; }
+void pragma::audio::IListener::SetOrientation(const Vector3 &at, const Vector3 &up) { m_orientation = {at, up}; }
+const std::pair<Vector3, Vector3> &pragma::audio::IListener::GetOrientation() const { return m_orientation; }
 
-float al::IListener::GetMetersPerUnit() const { return m_metersPerUnit; }
-void al::IListener::SetMetersPerUnit(float mu) { m_metersPerUnit = mu; }
+float pragma::audio::IListener::GetMetersPerUnit() const { return m_metersPerUnit; }
+void pragma::audio::IListener::SetMetersPerUnit(float mu) { m_metersPerUnit = mu; }

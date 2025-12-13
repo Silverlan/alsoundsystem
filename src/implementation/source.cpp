@@ -7,7 +7,7 @@ import :buffer;
 import :source;
 import :system;
 
-al::ISoundChannel::ISoundChannel(ISoundSystem &system, Decoder &decoder)
+pragma::audio::ISoundChannel::ISoundChannel(ISoundSystem &system, Decoder &decoder)
     : m_system(system), m_decoder(std::static_pointer_cast<Decoder>(decoder.shared_from_this()))
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
       ,
@@ -20,7 +20,7 @@ al::ISoundChannel::ISoundChannel(ISoundSystem &system, Decoder &decoder)
 #endif
 }
 
-al::ISoundChannel::ISoundChannel(ISoundSystem &system, ISoundBuffer &buffer)
+pragma::audio::ISoundChannel::ISoundChannel(ISoundSystem &system, ISoundBuffer &buffer)
     : m_system(system), m_buffer(buffer.shared_from_this()), m_bReady(buffer.IsReady())
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
       ,
@@ -34,7 +34,7 @@ al::ISoundChannel::ISoundChannel(ISoundSystem &system, ISoundBuffer &buffer)
 #endif
 }
 
-al::ISoundChannel::~ISoundChannel()
+pragma::audio::ISoundChannel::~ISoundChannel()
 {
 	RemoveEffects();
 
@@ -43,7 +43,7 @@ al::ISoundChannel::~ISoundChannel()
 #endif
 }
 
-void al::ISoundChannel::OnReady()
+void pragma::audio::ISoundChannel::OnReady()
 {
 	if(m_bSchedulePlay == true) {
 		m_bSchedulePlay = false;
@@ -51,44 +51,44 @@ void al::ISoundChannel::OnReady()
 	}
 }
 
-void al::ISoundChannel::Update()
+void pragma::audio::ISoundChannel::Update()
 {
 	if(m_bReady == false && m_buffer.expired() == false && m_buffer.lock()->IsReady() == true) {
 		m_bReady = true;
 		OnReady();
 	}
 }
-bool al::ISoundChannel::IsIdle() const { return !IsPlaying(); }
+bool pragma::audio::ISoundChannel::IsIdle() const { return !IsPlaying(); }
 
-std::vector<al::IEffect *> al::ISoundChannel::GetEffects()
+std::vector<pragma::audio::IEffect *> pragma::audio::ISoundChannel::GetEffects()
 {
-	std::vector<al::IEffect *> effects;
+	std::vector<IEffect *> effects;
 	effects.reserve(m_effects.size());
 	for(auto &effect : m_effects)
 		effects.push_back(effect.first.get());
 	return effects;
 }
-void al::ISoundChannel::SetEffectParameters(IEffect &effect, const EffectParams &params)
+void pragma::audio::ISoundChannel::SetEffectParameters(IEffect &effect, const EffectParams &params)
 {
 	auto it = std::find_if(m_effects.begin(), m_effects.end(), [&effect](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.first.get() == &effect) ? true : false; });
 	if(it == m_effects.end())
 		return;
 	SetEffectParameters(it->second, params);
 }
-void al::ISoundChannel::SetEffectGain(IEffect &effect, float gain)
+void pragma::audio::ISoundChannel::SetEffectGain(IEffect &effect, float gain)
 {
 	EffectParams params {};
 	params.gain = gain;
 	SetEffectParameters(effect, params);
 }
-void al::ISoundChannel::SetEffectGain(uint32_t slotId, float gain)
+void pragma::audio::ISoundChannel::SetEffectGain(uint32_t slotId, float gain)
 {
 	EffectParams params {};
 	params.gain = gain;
 	SetEffectParameters(slotId, params);
 }
-const al::EffectParams &al::ISoundChannel::GetDirectFilter() const { return m_directFilter; }
-bool al::ISoundChannel::AddEffect(IEffect &effect, uint32_t &slotId, const EffectParams &params)
+const pragma::audio::EffectParams &pragma::audio::ISoundChannel::GetDirectFilter() const { return m_directFilter; }
+bool pragma::audio::ISoundChannel::AddEffect(IEffect &effect, uint32_t &slotId, const EffectParams &params)
 {
 	slotId = std::numeric_limits<uint32_t>::max();
 	auto it = std::find_if(m_effects.begin(), m_effects.end(), [&effect](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.first.get() == &effect) ? true : false; });
@@ -115,29 +115,29 @@ bool al::ISoundChannel::AddEffect(IEffect &effect, uint32_t &slotId, const Effec
 	DoAddEffect(*slot, slotId, params);
 	return true;
 }
-bool al::ISoundChannel::AddEffect(IEffect &effect, const EffectParams &params)
+bool pragma::audio::ISoundChannel::AddEffect(IEffect &effect, const EffectParams &params)
 {
 	uint32_t slotId;
 	return AddEffect(effect, slotId, params);
 }
-bool al::ISoundChannel::AddEffect(IEffect &effect, float gain)
+bool pragma::audio::ISoundChannel::AddEffect(IEffect &effect, float gain)
 {
 	EffectParams params {};
 	params.gain = gain;
 	return AddEffect(effect, params);
 }
-bool al::ISoundChannel::AddEffect(IEffect &effect, uint32_t &slotId, float gain)
+bool pragma::audio::ISoundChannel::AddEffect(IEffect &effect, uint32_t &slotId, float gain)
 {
 	EffectParams params {};
 	params.gain = gain;
 	return AddEffect(effect, slotId, params);
 }
-void al::ISoundChannel::RemoveEffects()
+void pragma::audio::ISoundChannel::RemoveEffects()
 {
 	while(m_effects.empty() == false)
 		RemoveInternalEffect(m_effects.begin());
 }
-void al::ISoundChannel::RemoveInternalEffect(decltype(m_effects)::iterator it)
+void pragma::audio::ISoundChannel::RemoveInternalEffect(decltype(m_effects)::iterator it)
 {
 	auto slotId = it->second;
 	m_freeAuxEffectIds.push(slotId);
@@ -147,14 +147,14 @@ void al::ISoundChannel::RemoveInternalEffect(decltype(m_effects)::iterator it)
 	DoRemoveInternalEffect(slotId);
 	effect.DetachSource(*this);
 }
-void al::ISoundChannel::RemoveEffect(uint32_t slotId)
+void pragma::audio::ISoundChannel::RemoveEffect(uint32_t slotId)
 {
 	auto it = std::find_if(m_effects.begin(), m_effects.end(), [slotId](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.second == slotId) ? true : false; });
 	if(it == m_effects.end())
 		return;
 	RemoveInternalEffect(it);
 }
-void al::ISoundChannel::RemoveEffect(IEffect &effect)
+void pragma::audio::ISoundChannel::RemoveEffect(IEffect &effect)
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	auto it = std::find_if(m_effects.begin(), m_effects.end(), [&effect](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.first.get() == &effect) ? true : false; });
@@ -170,14 +170,14 @@ void al::ISoundChannel::RemoveEffect(IEffect &effect)
 #endif
 }
 
-al::ISoundSystem &al::ISoundChannel::GetSoundSystem() const { return m_system; }
+pragma::audio::ISoundSystem &pragma::audio::ISoundChannel::GetSoundSystem() const { return m_system; }
 
-const al::ISoundBuffer *al::ISoundChannel::GetBuffer() const { return const_cast<ISoundChannel *>(this)->GetBuffer(); }
-al::ISoundBuffer *al::ISoundChannel::GetBuffer() { return m_buffer.lock().get(); }
-const al::Decoder *al::ISoundChannel::GetDecoder() const { return const_cast<ISoundChannel *>(this)->GetDecoder(); }
-al::Decoder *al::ISoundChannel::GetDecoder() { return m_decoder.get(); }
+const pragma::audio::ISoundBuffer *pragma::audio::ISoundChannel::GetBuffer() const { return const_cast<ISoundChannel *>(this)->GetBuffer(); }
+pragma::audio::ISoundBuffer *pragma::audio::ISoundChannel::GetBuffer() { return m_buffer.lock().get(); }
+const pragma::audio::Decoder *pragma::audio::ISoundChannel::GetDecoder() const { return const_cast<ISoundChannel *>(this)->GetDecoder(); }
+pragma::audio::Decoder *pragma::audio::ISoundChannel::GetDecoder() { return m_decoder.get(); }
 
-float al::ISoundChannel::GetMaxAudibleDistance() const
+float pragma::audio::ISoundChannel::GetMaxAudibleDistance() const
 {
 	float rolloff = GetRolloffFactor();
 	if(rolloff == 0.f)
@@ -185,16 +185,16 @@ float al::ISoundChannel::GetMaxAudibleDistance() const
 	return (GetMaxDistance() - GetReferenceDistance()) * (1.f / rolloff) + GetReferenceDistance();
 }
 
-al::impl::BufferBase *al::ISoundChannel::GetBaseBuffer() const
+pragma::audio::impl::BufferBase *pragma::audio::ISoundChannel::GetBaseBuffer() const
 {
 	if(m_decoder != nullptr)
-		return static_cast<al::impl::BufferBase *>(m_decoder.get());
+		return static_cast<impl::BufferBase *>(m_decoder.get());
 	if(m_buffer.expired() == true)
 		return nullptr;
-	return static_cast<al::impl::BufferBase *>(m_buffer.lock().get());
+	return static_cast<impl::BufferBase *>(m_buffer.lock().get());
 }
 
-void al::ISoundChannel::SetIdentifier(const std::string &identifier)
+void pragma::audio::ISoundChannel::SetIdentifier(const std::string &identifier)
 {
 	m_identifier = identifier;
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
@@ -203,18 +203,18 @@ void al::ISoundChannel::SetIdentifier(const std::string &identifier)
 #endif
 #endif
 }
-const std::string &al::ISoundChannel::GetIdentifier() const { return m_identifier; }
-bool al::ISoundChannel::IsStopped() const { return (IsPlaying() == false && GetOffset() == 0.f) ? true : false; }
+const std::string &pragma::audio::ISoundChannel::GetIdentifier() const { return m_identifier; }
+bool pragma::audio::ISoundChannel::IsStopped() const { return (IsPlaying() == false && GetOffset() == 0.f) ? true : false; }
 
-void al::ISoundChannel::SetMinGain(float gain) { SetGainRange(gain, GetMaxGain()); }
-void al::ISoundChannel::SetMaxGain(float gain) { SetGainRange(GetMinGain(), gain); }
+void pragma::audio::ISoundChannel::SetMinGain(float gain) { SetGainRange(gain, GetMaxGain()); }
+void pragma::audio::ISoundChannel::SetMaxGain(float gain) { SetGainRange(GetMinGain(), gain); }
 
-void al::ISoundChannel::SetReferenceDistance(float dist) { SetDistanceRange(dist, GetMaxDistance()); }
-float al::ISoundChannel::GetReferenceDistance() const { return GetDistanceRange().first; }
-void al::ISoundChannel::SetMaxDistance(float dist) { SetDistanceRange(GetReferenceDistance(), dist); }
-float al::ISoundChannel::GetMaxDistance() const { return GetDistanceRange().second; }
+void pragma::audio::ISoundChannel::SetReferenceDistance(float dist) { SetDistanceRange(dist, GetMaxDistance()); }
+float pragma::audio::ISoundChannel::GetReferenceDistance() const { return GetDistanceRange().first; }
+void pragma::audio::ISoundChannel::SetMaxDistance(float dist) { SetDistanceRange(GetReferenceDistance(), dist); }
+float pragma::audio::ISoundChannel::GetMaxDistance() const { return GetDistanceRange().second; }
 
-Vector3 al::ISoundChannel::GetWorldPosition() const
+Vector3 pragma::audio::ISoundChannel::GetWorldPosition() const
 {
 	if(IsRelative() == false)
 		return GetPosition();
@@ -227,41 +227,41 @@ Vector3 al::ISoundChannel::GetWorldPosition() const
 	return pos;
 }
 
-void al::ISoundChannel::SetInnerConeAngle(float inner) { SetConeAngles(inner, GetOuterConeAngle()); }
-float al::ISoundChannel::GetInnerConeAngle() const { return GetConeAngles().first; }
-void al::ISoundChannel::SetOuterConeAngle(float outer) { SetConeAngles(GetInnerConeAngle(), outer); }
-float al::ISoundChannel::GetOuterConeAngle() const { return GetConeAngles().second; }
+void pragma::audio::ISoundChannel::SetInnerConeAngle(float inner) { SetConeAngles(inner, GetOuterConeAngle()); }
+float pragma::audio::ISoundChannel::GetInnerConeAngle() const { return GetConeAngles().first; }
+void pragma::audio::ISoundChannel::SetOuterConeAngle(float outer) { SetConeAngles(GetInnerConeAngle(), outer); }
+float pragma::audio::ISoundChannel::GetOuterConeAngle() const { return GetConeAngles().second; }
 
-void al::ISoundChannel::SetOuterConeGain(float gain)
+void pragma::audio::ISoundChannel::SetOuterConeGain(float gain)
 {
 	auto gains = GetOuterConeGains();
 	SetOuterConeGains(gain, gains.second);
 }
-void al::ISoundChannel::SetOuterConeGainHF(float gain)
+void pragma::audio::ISoundChannel::SetOuterConeGainHF(float gain)
 {
 	auto gains = GetOuterConeGains();
 	SetOuterConeGains(gains.first, gain);
 }
 
-void al::ISoundChannel::SetRoomRolloffFactor(float roomFactor) { SetRolloffFactors(GetRolloffFactor(), roomFactor); }
+void pragma::audio::ISoundChannel::SetRoomRolloffFactor(float roomFactor) { SetRolloffFactors(GetRolloffFactor(), roomFactor); }
 
-void al::ISoundChannel::SetLeftStereoAngle(float ang) { SetStereoAngles(ang, GetRightStereoAngle()); }
-float al::ISoundChannel::GetLeftStereoAngle() const { return GetStereoAngles().first; }
-void al::ISoundChannel::SetRightStereoAngle(float ang) { SetStereoAngles(GetLeftStereoAngle(), ang); }
-float al::ISoundChannel::GetRightStereoAngle() const { return GetStereoAngles().second; }
+void pragma::audio::ISoundChannel::SetLeftStereoAngle(float ang) { SetStereoAngles(ang, GetRightStereoAngle()); }
+float pragma::audio::ISoundChannel::GetLeftStereoAngle() const { return GetStereoAngles().first; }
+void pragma::audio::ISoundChannel::SetRightStereoAngle(float ang) { SetStereoAngles(GetLeftStereoAngle(), ang); }
+float pragma::audio::ISoundChannel::GetRightStereoAngle() const { return GetStereoAngles().second; }
 
-float al::ISoundChannel::GetDuration() const
+float pragma::audio::ISoundChannel::GetDuration() const
 {
 	auto *buf = GetBaseBuffer();
 	return (buf != nullptr) ? buf->GetDuration() : 0.f;
 }
 
-bool al::ISoundChannel::IsMono() const
+bool pragma::audio::ISoundChannel::IsMono() const
 {
 	auto *buf = GetBaseBuffer();
 	return (buf != nullptr) ? buf->IsMono() : false;
 }
-bool al::ISoundChannel::IsStereo() const
+bool pragma::audio::ISoundChannel::IsStereo() const
 {
 	auto *buf = GetBaseBuffer();
 	return (buf != nullptr) ? buf->IsStereo() : false;
@@ -269,18 +269,18 @@ bool al::ISoundChannel::IsStereo() const
 
 ////////
 
-std::shared_ptr<al::SoundSource> al::SoundSource::Create(const std::shared_ptr<ISoundChannel> &channel) {
-	auto snd = std::shared_ptr<al::SoundSource> {new al::SoundSource {channel}, [](al::SoundSource *snd) {
+std::shared_ptr<pragma::audio::SoundSource> pragma::audio::SoundSource::Create(const std::shared_ptr<ISoundChannel> &channel) {
+	auto snd = std::shared_ptr<SoundSource> {new SoundSource {channel}, [](SoundSource *snd) {
 		snd->OnRelease();
 		delete snd;
 	}};
 	return snd;
 }
-al::SoundSource::SoundSource(const std::shared_ptr<ISoundChannel> &channel) : m_channel {channel} {}
-al::SoundSource::~SoundSource() {}
-void al::SoundSource::InitializeHandle(const util::TSharedHandle<SoundSource> &ptr) {
+pragma::audio::SoundSource::SoundSource(const std::shared_ptr<ISoundChannel> &channel) : m_channel {channel} {}
+pragma::audio::SoundSource::~SoundSource() {}
+void pragma::audio::SoundSource::InitializeHandle(const pragma::util::TSharedHandle<SoundSource> &ptr) {
 	m_handle = ptr;
 }
-al::SoundSourceHandle al::SoundSource::GetHandle() const { return util::claim_shared_handle_ownership(m_handle); }
+pragma::audio::SoundSourceHandle pragma::audio::SoundSource::GetHandle() const { return pragma::util::claim_shared_handle_ownership(m_handle); }
 
-void al::SoundSource::OnRelease() { m_channel->GetSoundSystem().OnSoundRelease(*this); }
+void pragma::audio::SoundSource::OnRelease() { m_channel->GetSoundSystem().OnSoundRelease(*this); }

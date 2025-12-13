@@ -12,10 +12,10 @@ export import :types;
 
 #pragma warning(push)
 #pragma warning(disable : 4251)
-export namespace al {
+export namespace pragma::audio {
 	class ISoundBuffer;
 	class ISoundSystem;
-	class DLLALSYS ISoundChannel : virtual public util::CallbackHandler, virtual public util::inheritable_enable_shared_from_this<ISoundChannel> {
+	class DLLALSYS ISoundChannel : virtual public pragma::util::CallbackHandler, virtual public pragma::util::inheritable_enable_shared_from_this<ISoundChannel> {
 	  public:
 		virtual ~ISoundChannel();
 
@@ -191,8 +191,8 @@ export namespace al {
 			steam_audio::Properties properties = {};
 		};
 		std::unique_ptr<SteamAudioData> m_steamAudioData = nullptr;
-		util::Overridable<bool> m_bSteamAudioSpatializerEnabled = false;
-		util::Overridable<bool> m_bSteamAudioReverbEnabled = false;
+		pragma::util::Overridable<bool> m_bSteamAudioSpatializerEnabled = false;
+		pragma::util::Overridable<bool> m_bSteamAudioReverbEnabled = false;
 		bool m_bCustomChannelGroup = false;
 		mutable FMOD::ChannelGroup *m_channelGroup = nullptr;
 #endif
@@ -223,7 +223,7 @@ export namespace al {
 	  public:
 		static std::shared_ptr<SoundSource> Create(const std::shared_ptr<ISoundChannel> &channel);
 		virtual ~SoundSource();
-		void InitializeHandle(const util::TSharedHandle<SoundSource> &ptr);
+		void InitializeHandle(const pragma::util::TSharedHandle<SoundSource> &ptr);
 		SoundSourceHandle GetHandle() const;
 
 		virtual void Update() { return (*this)->Update(); }
@@ -240,7 +240,7 @@ export namespace al {
 		SoundSource(const std::shared_ptr<ISoundChannel> &channel);
 	  private:
 		std::shared_ptr<ISoundChannel> m_channel = nullptr;
-		mutable util::TWeakSharedHandle<SoundSource> m_handle = {};
+		mutable pragma::util::TWeakSharedHandle<SoundSource> m_handle = {};
 	};
 	using PSoundSource = std::shared_ptr<SoundSource>;
 	using WPSoundSource = std::weak_ptr<SoundSource>;

@@ -11,7 +11,7 @@ import :source;
 import :system;
 import pragma.audio.util;
 
-namespace al {
+namespace pragma::audio {
 #ifdef _DEBUG
 	class MessageHandler : public alure::MessageHandler {
 	  public:
@@ -49,11 +49,11 @@ void stereo_to_mono(T *stereoData, std::vector<uint8_t> &monoData, uint32_t data
 
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
-static bool apply_steam_audio_processing(ipl::Scene &scene, al::impl::BufferLoadData &loadData, void *sampleData, std::vector<uint8_t> &outputData, int32_t &format, alure::ChannelConfig channel, uint32_t &frequency, uint32_t dataLen)
+static bool apply_steam_audio_processing(ipl::Scene &scene, pragma::audio::impl::BufferLoadData &loadData, void *sampleData, std::vector<uint8_t> &outputData, int32_t &format, alure::ChannelConfig channel, uint32_t &frequency, uint32_t dataLen)
 {
-	if(loadData.soundSystem.IsSteamAudioEnabled() == false || loadData.userData == nullptr || (loadData.flags & al::impl::BufferLoadData::Flags::SingleSourceDecoder) == al::impl::BufferLoadData::Flags::None || channel != alure::ChannelConfig::Mono || scene.IsComplete() == false)
+	if(loadData.soundSystem.IsSteamAudioEnabled() == false || loadData.userData == nullptr || (loadData.flags & pragma::audio::impl::BufferLoadData::Flags::SingleSourceDecoder) == pragma::audio::impl::BufferLoadData::Flags::None || channel != alure::ChannelConfig::Mono || scene.IsComplete() == false)
 		return false;
-	auto hSound = *static_cast<al::SoundSourceHandle *>(loadData.userData.get());
+	auto hSound = *static_cast<pragma::audio::SoundSourceHandle *>(loadData.userData.get());
 	if(hSound.IsValid() == false)
 		return false;
 	auto &snd = *hSound.get();
@@ -102,22 +102,22 @@ static bool apply_steam_audio_processing(ipl::Scene &scene, al::impl::BufferLoad
 		sampleSize = sizeof(uint8_t);
 		sampleCast = [](uint8_t *sampleVal) -> float {
 			// uint8_t has to be mapped to the range of an int8_t before conversion
-			return static_cast<int8_t>(static_cast<int32_t>(*sampleVal) - umath::abs(static_cast<int32_t>(std::numeric_limits<int8_t>::lowest()))) / umath::abs(static_cast<float>(std::numeric_limits<int8_t>::lowest()));
+			return static_cast<int8_t>(static_cast<int32_t>(*sampleVal) - pragma::math::abs(static_cast<int32_t>(std::numeric_limits<int8_t>::lowest()))) / pragma::math::abs(static_cast<float>(std::numeric_limits<int8_t>::lowest()));
 		};
 		sampleBackCast = [](float inVal, uint8_t *outVal) {
-			*outVal = static_cast<uint8_t>(umath::clamp(inVal * umath::abs(static_cast<float>(std::numeric_limits<int8_t>::lowest())), static_cast<float>(std::numeric_limits<int8_t>::lowest()),
+			*outVal = static_cast<uint8_t>(pragma::math::clamp(inVal * pragma::math::abs(static_cast<float>(std::numeric_limits<int8_t>::lowest())), static_cast<float>(std::numeric_limits<int8_t>::lowest()),
 			                                 static_cast<float>(std::numeric_limits<int8_t>::max()))
-			  + umath::abs(static_cast<int32_t>(std::numeric_limits<int8_t>::lowest())) // Map int8_t back to uint8_t
+			  + pragma::math::abs(static_cast<int32_t>(std::numeric_limits<int8_t>::lowest())) // Map int8_t back to uint8_t
 			);
 		};
 		break;
 	case AL_MONO16_SOFT:
 		sampleSize = sizeof(int16_t);
 		sampleCast = [](uint8_t *sampleVal) -> float {
-			return *reinterpret_cast<int16_t *>(sampleVal) / umath::abs(static_cast<float>(std::numeric_limits<int16_t>::lowest())); // Negative integer has higher range, so use 'lowest' instead of 'max'
+			return *reinterpret_cast<int16_t *>(sampleVal) / pragma::math::abs(static_cast<float>(std::numeric_limits<int16_t>::lowest())); // Negative integer has higher range, so use 'lowest' instead of 'max'
 		};
 		sampleBackCast = [](float inVal, uint8_t *outVal) {
-			*reinterpret_cast<int16_t *>(outVal) = static_cast<int16_t>(umath::clamp(inVal * umath::abs(static_cast<float>(std::numeric_limits<int16_t>::lowest())), static_cast<float>(std::numeric_limits<int16_t>::lowest()), static_cast<float>(std::numeric_limits<int16_t>::max())));
+			*reinterpret_cast<int16_t *>(outVal) = static_cast<int16_t>(pragma::math::clamp(inVal * pragma::math::abs(static_cast<float>(std::numeric_limits<int16_t>::lowest())), static_cast<float>(std::numeric_limits<int16_t>::lowest()), static_cast<float>(std::numeric_limits<int16_t>::max())));
 		};
 		break;
 	case AL_MONO32F_SOFT:
@@ -152,7 +152,7 @@ static bool apply_steam_audio_processing(ipl::Scene &scene, al::impl::BufferLoad
 	}
 
 	auto bOverwriteOutputData = false;
-	if(dynamic_cast<al::BinaryDecoder *>(alDecoder.get()) == nullptr) {
+	if(dynamic_cast<pragma::audio::BinaryDecoder *>(alDecoder.get()) == nullptr) {
 		// If this isn't a binary decoder, we're still streaming into a buffer
 		// so that a binary decoder can be used in the future
 		auto &wpBuffer = loadData.buffer;
@@ -188,9 +188,9 @@ static bool apply_steam_audio_processing(ipl::Scene &scene, al::impl::BufferLoad
 	opt.directOcclusionMode = IPLDirectOcclusionMode::IPL_DIRECTOCCLUSION_TRANSMISSIONBYFREQUENCY;
 
 	IPLAudioBuffer outbuffer {scene.GetIplOutputFormat(), frameSize, steamOutputData};
-	auto numframes = umath::ceil(sampleCount / static_cast<float>(frameSize));
+	auto numframes = pragma::math::ceil(sampleCount / static_cast<float>(frameSize));
 	for(auto i = decltype(numframes) {0}; i < numframes; ++i) {
-		auto effectSamples = umath::min(sampleCount, frameSize);
+		auto effectSamples = pragma::math::min(sampleCount, frameSize);
 		inbuffer.numSamples = effectSamples;
 		outbuffer.numSamples = effectSamples;
 		iplApplyDirectSoundEffect(directSoundEffect, inbuffer, directSndPath, opt, outbuffer);
@@ -220,16 +220,16 @@ static bool apply_steam_audio_processing(ipl::Scene &scene, al::impl::BufferLoad
 #endif
 #endif
 
-al::ISoundSystem::ISoundSystem(float metersPerUnit) : m_metersPerUnit {metersPerUnit}
+pragma::audio::ISoundSystem::ISoundSystem(float metersPerUnit) : m_metersPerUnit {metersPerUnit}
 {
 	SetSoundSourceFactory([](const PSoundChannel &channel) -> PSoundSource {
-		return al::SoundSource::Create(channel);
+		return SoundSource::Create(channel);
 	});
 }
 
-al::ISoundSystem::~ISoundSystem() { OnRelease(); }
+pragma::audio::ISoundSystem::~ISoundSystem() { OnRelease(); }
 
-void al::ISoundSystem::OnRelease()
+void pragma::audio::ISoundSystem::OnRelease()
 {
 	m_sources.clear();
 	m_effectSlots.clear();
@@ -245,13 +245,13 @@ void al::ISoundSystem::OnRelease()
 #endif
 }
 
-void al::ISoundSystem::OnSoundRelease(const SoundSource &snd)
+void pragma::audio::ISoundSystem::OnSoundRelease(const SoundSource &snd)
 {
 	if(m_onReleaseSoundCallback)
 		m_onReleaseSoundCallback(snd);
 }
 
-void al::ISoundSystem::Initialize()
+void pragma::audio::ISoundSystem::Initialize()
 {
 	SetSpeedOfSound(340.29f / m_metersPerUnit);
 	m_listener = CreateListener();
@@ -259,9 +259,9 @@ void al::ISoundSystem::Initialize()
 	assert(m_listener);
 }
 
-void al::ISoundSystem::SetSoundSourceFactory(const SoundSourceFactory &factory) { m_soundSourceFactory = factory; }
+void pragma::audio::ISoundSystem::SetSoundSourceFactory(const SoundSourceFactory &factory) { m_soundSourceFactory = factory; }
 
-void al::ISoundSystem::FreeAuxiliaryEffectSlot(IAuxiliaryEffectSlot *slot)
+void pragma::audio::ISoundSystem::FreeAuxiliaryEffectSlot(IAuxiliaryEffectSlot *slot)
 {
 	auto it = std::find_if(m_effectSlots.begin(), m_effectSlots.end(), [slot](const PAuxiliaryEffectSlot &slotOther) { return (slotOther.get() == slot) ? true : false; });
 	if(it == m_effectSlots.end())
@@ -269,7 +269,7 @@ void al::ISoundSystem::FreeAuxiliaryEffectSlot(IAuxiliaryEffectSlot *slot)
 	m_effectSlots.erase(it);
 }
 
-void al::ISoundSystem::Update()
+void pragma::audio::ISoundSystem::Update()
 {
 	for(auto it = m_sources.begin(); it != m_sources.end();) {
 		auto &src = *it;
@@ -282,14 +282,14 @@ void al::ISoundSystem::Update()
 	}
 }
 
-al::PSoundSource al::ISoundSystem::InitializeSource(const std::shared_ptr<ISoundChannel> &channel)
+pragma::audio::PSoundSource pragma::audio::ISoundSystem::InitializeSource(const std::shared_ptr<ISoundChannel> &channel)
 {
 	if(channel == nullptr)
 		return nullptr;
 	auto psource = m_soundSourceFactory ? m_soundSourceFactory(channel) : nullptr;
 	if(!psource)
 		return nullptr;
-	m_sources.push_back(util::to_shared_handle(psource));
+	m_sources.push_back(pragma::util::to_shared_handle(psource));
 	psource->InitializeHandle(m_sources.back());
 	ApplyGlobalEffects(*psource);
 
@@ -300,7 +300,7 @@ al::PSoundSource al::ISoundSystem::InitializeSource(const std::shared_ptr<ISound
 
 	return psource;
 }
-al::PSoundSource al::ISoundSystem::CreateSource(const std::string &name, bool bStereo, Type type)
+pragma::audio::PSoundSource pragma::audio::ISoundSystem::CreateSource(const std::string &name, bool bStereo, Type type)
 {
 #if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
@@ -327,7 +327,7 @@ al::PSoundSource al::ISoundSystem::CreateSource(const std::string &name, bool bS
 	}
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 	auto nname = FileManager::GetCanonicalizedPath(name);
-	ustring::to_lower(nname);
+	pragma::string::to_lower(nname);
 	auto it = m_audioBuffers.find(nname);
 	auto bNewDataBuffer = false;
 	if(it == m_audioBuffers.end()) {
@@ -335,10 +335,10 @@ al::PSoundSource al::ISoundSystem::CreateSource(const std::string &name, bool bS
 		bNewDataBuffer = true;
 	}
 	auto &audioDataBuffer = *it->second;
-	std::shared_ptr<al::Decoder> decoder = nullptr;
+	std::shared_ptr<pragma::audio::Decoder> decoder = nullptr;
 	if(audioDataBuffer.audioResampler != nullptr && audioDataBuffer.audioResampler->IsComplete()) {
-		auto alDecoder = std::shared_ptr<alure::Decoder>(new al::BinaryDecoder(it->second));
-		decoder = std::shared_ptr<al::Decoder>(new al::Decoder(alDecoder, name));
+		auto alDecoder = std::shared_ptr<alure::Decoder>(new pragma::audio::BinaryDecoder(it->second));
+		decoder = std::shared_ptr<pragma::audio::Decoder>(new pragma::audio::Decoder(alDecoder, name));
 		auto userData = std::make_shared<impl::BufferLoadData>(*this);
 		userData->flags |= impl::BufferLoadData::Flags::SingleSourceDecoder;
 		alDecoder->userData = userData;
@@ -358,7 +358,7 @@ al::PSoundSource al::ISoundSystem::CreateSource(const std::string &name, bool bS
 		return source;
 	auto &loadData = *static_cast<impl::BufferLoadData *>(userData.get());
 	if((loadData.flags & impl::BufferLoadData::Flags::SingleSourceDecoder) != impl::BufferLoadData::Flags::None) {
-		loadData.userData = std::make_shared<al::SoundSourceHandle>(source->GetHandle());
+		loadData.userData = std::make_shared<pragma::audio::SoundSourceHandle>(source->GetHandle());
 		loadData.buffer = it->second;
 	}
 	return source;
@@ -367,17 +367,17 @@ al::PSoundSource al::ISoundSystem::CreateSource(const std::string &name, bool bS
 	return nullptr; // FMOD TODO
 #endif
 }
-const std::vector<al::SoundSourceHandle> &al::ISoundSystem::GetSources() const { return const_cast<ISoundSystem *>(this)->GetSources(); }
-std::vector<al::SoundSourceHandle> &al::ISoundSystem::GetSources() { return m_sources; }
+const std::vector<pragma::audio::SoundSourceHandle> &pragma::audio::ISoundSystem::GetSources() const { return const_cast<ISoundSystem *>(this)->GetSources(); }
+std::vector<pragma::audio::SoundSourceHandle> &pragma::audio::ISoundSystem::GetSources() { return m_sources; }
 
-al::PSoundSource al::ISoundSystem::CreateSource(ISoundBuffer &buffer)
+pragma::audio::PSoundSource pragma::audio::ISoundSystem::CreateSource(ISoundBuffer &buffer)
 {
 	auto channel = CreateChannel(buffer);
 	if(!channel)
 		return nullptr;
 	return InitializeSource(channel);
 }
-al::PSoundSource al::ISoundSystem::CreateSource(Decoder &decoder)
+pragma::audio::PSoundSource pragma::audio::ISoundSystem::CreateSource(Decoder &decoder)
 {
 	auto channel = CreateChannel(decoder);
 	if(!channel)
@@ -385,12 +385,12 @@ al::PSoundSource al::ISoundSystem::CreateSource(Decoder &decoder)
 	return InitializeSource(channel);
 }
 
-uint32_t al::ISoundSystem::GetAudioFrameSampleCount() const { return m_audioFrameSampleCount; }
-void al::ISoundSystem::SetAudioFrameSampleCount(uint32_t size) { m_audioFrameSampleCount = size; }
+uint32_t pragma::audio::ISoundSystem::GetAudioFrameSampleCount() const { return m_audioFrameSampleCount; }
+void pragma::audio::ISoundSystem::SetAudioFrameSampleCount(uint32_t size) { m_audioFrameSampleCount = size; }
 
-std::vector<al::ISoundBuffer *> al::ISoundSystem::GetBuffers() const
+std::vector<pragma::audio::ISoundBuffer *> pragma::audio::ISoundSystem::GetBuffers() const
 {
-	std::vector<al::ISoundBuffer *> buffers;
+	std::vector<ISoundBuffer *> buffers;
 	buffers.reserve(m_buffers.size() * 2);
 	for(auto &pair : m_buffers) {
 		if(pair.second.mono != nullptr)
@@ -401,13 +401,13 @@ std::vector<al::ISoundBuffer *> al::ISoundSystem::GetBuffers() const
 	return buffers;
 }
 
-void al::ISoundSystem::StopSounds()
+void pragma::audio::ISoundSystem::StopSounds()
 {
 	for(auto &hSrc : m_sources)
 		(*hSrc)->Stop();
 }
 
-const al::IListener &al::ISoundSystem::GetListener() const { return const_cast<ISoundSystem *>(this)->GetListener(); }
-al::IListener &al::ISoundSystem::GetListener() { return *m_listener; }
+const pragma::audio::IListener &pragma::audio::ISoundSystem::GetListener() const { return const_cast<ISoundSystem *>(this)->GetListener(); }
+pragma::audio::IListener &pragma::audio::ISoundSystem::GetListener() { return *m_listener; }
 
-bool al::get_sound_duration(const std::string path, float &duration) { return pragma::audio::util::get_duration(path, duration); }
+bool pragma::audio::get_sound_duration(const std::string path, float &duration) { return pragma::audio::util::get_duration(path, duration); }

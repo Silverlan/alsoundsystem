@@ -16,7 +16,7 @@ export {
 	namespace ipl {
 		struct AudioDataBuffer;
 	};
-	namespace al {
+	namespace pragma::audio {
 		class DLLALSYS BinaryDecoder : public alure::Decoder {
 		  public:
 			BinaryDecoder(std::shared_ptr<ipl::AudioDataBuffer> &audioDataBuffer);

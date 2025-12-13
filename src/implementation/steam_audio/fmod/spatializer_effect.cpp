@@ -555,9 +555,9 @@ public:
 
 		IPLSource source {};
 		source.position = sourcePos;
-		source.ahead = al::to_custom_vector<IPLVector3>(al::to_audio_direction(Vector3{1.f,0.f,0.f}));
-		source.right = al::to_custom_vector<IPLVector3>(al::to_audio_direction(Vector3{0.f,0.f,-1.f}));
-		source.up = al::to_custom_vector<IPLVector3>(al::to_audio_direction(Vector3{0.f,1.f,0.f}));
+		source.ahead = pragma::audio::to_custom_vector<IPLVector3>(pragma::audio::to_audio_direction(Vector3{1.f,0.f,0.f}));
+		source.right = pragma::audio::to_custom_vector<IPLVector3>(pragma::audio::to_audio_direction(Vector3{0.f,0.f,-1.f}));
+		source.up = pragma::audio::to_custom_vector<IPLVector3>(pragma::audio::to_audio_direction(Vector3{0.f,1.f,0.f}));
 		source.directivity.dipoleWeight = 0.f; // TODO
         if (mSceneState && mSceneState->environmentalRenderer())
         {

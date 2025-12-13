@@ -10,7 +10,7 @@ export module pragma.soundsystem:types;
 export import pragma.util;
 export import std.compat;
 
-export namespace al {
+export namespace pragma::audio {
 	struct EffectParams;
 	class SoundSource;
 	class Decoder;
@@ -30,8 +30,8 @@ export namespace al {
 
 	using SoundSourceFactory = std::function<PSoundSource(const PSoundChannel &)>;
 
-	using EffectHandle = util::TSharedHandle<IEffect>;
-	using SoundSourceHandle = util::TSharedHandle<SoundSource>;
+	using EffectHandle = pragma::util::TSharedHandle<IEffect>;
+	using SoundSourceHandle = pragma::util::TSharedHandle<SoundSource>;
 
 	struct DLLALSYS EffectParams {
 		EffectParams(float gain = 1.f, float gainHF = 1.f, float gainLF = 1.f);

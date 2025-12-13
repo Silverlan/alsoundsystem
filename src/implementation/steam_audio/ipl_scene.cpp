@@ -103,7 +103,7 @@ bool ipl::Scene::DumpScene(const std::string &objFile) const
 {
 	if(m_iplScene == nullptr || IsFinalized() == false || IsComplete() == false)
 		return false;
-	auto path = util::FilePath(filemanager::get_program_write_path(), objFile).GetString();
+	auto path = pragma::util::FilePath(filemanager::get_program_write_path(), objFile).GetString();
 	iplSaveSceneAsObj(m_iplScene.get(), const_cast<char *>(path.c_str()));
 	return true;
 }
@@ -121,15 +121,15 @@ void ipl::Scene::GetProbeSpheres(std::vector<ProbeSphere> &spheres)
 		for(auto &iplSphere : iplSpheres) {
 			spheres.push_back({});
 			auto &sphere = spheres.back();
-			sphere.origin = al::to_game_position(al::to_game_vector(iplSphere.center));
-			sphere.radius = al::to_game_distance(iplSphere.radius);
+			sphere.origin = pragma::audio::to_game_position(pragma::audio::to_game_vector(iplSphere.center));
+			sphere.radius = pragma::audio::to_game_distance(iplSphere.radius);
 		}
 	}
 }
 
 bool ipl::Scene::FindBakedSoundSourceIdentifier(const std::string &name, DSPEffect dspEffectType, IPLint32 &identifier)
 {
-	auto it = std::find_if(m_propagationSoundSources.begin(), m_propagationSoundSources.end(), [&name](const PropagationSoundSource &src) { return ustring::compare(name, src.name); });
+	auto it = std::find_if(m_propagationSoundSources.begin(), m_propagationSoundSources.end(), [&name](const PropagationSoundSource &src) { return pragma::string::compare(name, src.name); });
 	if(it == m_propagationSoundSources.end())
 		return false;
 	auto strIdentifier = name;
@@ -146,7 +146,7 @@ bool ipl::Scene::FindBakedSoundSourceIdentifier(const std::string &name, DSPEffe
 	return true;
 }
 
-void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const FinalizeInfo &info, const std::function<void(LoadStage, float)> &fStageProgress, const std::function<void(void)> &fOnComplete, const std::function<void(IPLerror)> &errorHandler)
+void ipl::Scene::Finalize(const std::shared_ptr<fs::VFilePtrInternal> &f, const FinalizeInfo &info, const std::function<void(LoadStage, float)> &fStageProgress, const std::function<void(void)> &fOnComplete, const std::function<void(IPLerror)> &errorHandler)
 {
 	if(m_bFinalized == true)
 		return;
@@ -156,7 +156,7 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 
 	m_finalizeData = std::make_unique<FinalizeData>();
 	m_finalizeData->working = true;
-	m_iplSimSettings.maxConvolutionSources = umath::max(m_propagationSoundSources.size(), static_cast<size_t>(1));
+	m_iplSimSettings.maxConvolutionSources = pragma::math::max(m_propagationSoundSources.size(), static_cast<size_t>(1));
 
 	// Hack: It's not possible to pass user-data to any of the steam audio callback functions (since they're c-functions).
 	// Steam audio should only be used once at a time, so we just set the callback as a static variable instead (making it accessable in the callbacks).
@@ -165,7 +165,7 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 
 	m_finalizeData->AddThread([this, f, fOnComplete, errorHandler, fStageProgress, info]() {
 		auto iplContext = m_context->GetIplContext();
-		util::ScopeGuard sgScene {};
+		pragma::util::ScopeGuard sgScene {};
 		Vector3 min {std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
 		Vector3 max {std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()};
 		auto bBakeData = false;
@@ -245,9 +245,9 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 		IPLhandle envHandle = nullptr;
 #if IPL_ENABLE_PROBES != 0
 		if(bBakeData == true) {
-			util::ScopeGuard sgProbeBox {};
-			util::ScopeGuard sgProbeBatch {};
-			util::ScopeGuard sgProbeManager {};
+			pragma::util::ScopeGuard sgProbeBox {};
+			pragma::util::ScopeGuard sgProbeBatch {};
+			pragma::util::ScopeGuard sgProbeManager {};
 
 			// Generate probes
 			if(m_probeBoxes.empty() == false) {
@@ -255,16 +255,16 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 				for(auto &probeBox : m_probeBoxes) {
 					IPLProbePlacementParams probePlacementParams {};
 					probePlacementParams.placement = probeBox.centroid ? IPLProbePlacement::IPL_PLACEMENT_CENTROID : IPLProbePlacement::IPL_PLACEMENT_UNIFORMFLOOR;
-					probePlacementParams.spacing = al::to_audio_distance(probeBox.spacing);
-					probePlacementParams.heightAboveFloor = al::to_audio_distance(probeBox.heightAboveFloor);
+					probePlacementParams.spacing = pragma::audio::to_audio_distance(probeBox.spacing);
+					probePlacementParams.heightAboveFloor = pragma::audio::to_audio_distance(probeBox.heightAboveFloor);
 					auto min = probeBox.min;
 					auto max = probeBox.max;
 					uvec::to_min_max(min, max);
 					auto center = (min + max) / 2.f;
 					auto scale = (max - center) - (min - center);
 
-					auto iplCenter = al::to_audio_position(center);
-					auto iplScale = probeBox.centroid ? Vector3 {probePlacementParams.spacing, probePlacementParams.spacing, probePlacementParams.spacing} : al::to_audio_position(scale);
+					auto iplCenter = pragma::audio::to_audio_position(center);
+					auto iplScale = probeBox.centroid ? Vector3 {probePlacementParams.spacing, probePlacementParams.spacing, probePlacementParams.spacing} : pragma::audio::to_audio_position(scale);
 
 					std::array<float, 16> m = {iplScale.x, 0.f, 0.f, 0.f, 0.f, iplScale.y, 0.f, 0.f, 0.f, 0.f, iplScale.z, 0.f, iplCenter.x, iplCenter.y, iplCenter.z, 1.f};
 					IPLhandle probeHandle = nullptr;
@@ -284,8 +284,8 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 				auto scale = (max - center) - (min - center);
 
 				std::array<float, 16> m = {scale.x, 0.f, 0.f, 0.f, 0.f, scale.y, 0.f, 0.f, 0.f, 0.f, scale.z, 0.f, center.x, center.y, center.z, 1.f};
-				probePlacementParams.spacing = al::to_audio_distance(info.defaultSpacing);
-				probePlacementParams.heightAboveFloor = al::to_audio_distance(info.defaultHeightAboveFloor);
+				probePlacementParams.spacing = pragma::audio::to_audio_distance(info.defaultSpacing);
+				probePlacementParams.heightAboveFloor = pragma::audio::to_audio_distance(info.defaultHeightAboveFloor);
 
 				IPLhandle probeBox = nullptr;
 				auto err = iplCreateProbeBox(iplContext, m_iplScene.get(), m.data(), probePlacementParams, [](float progress) { loadStageProgressCallback(LoadStage::GeneratingProbes, progress); }, &probeBox);
@@ -358,7 +358,7 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 				return;
 			}
 			m_iplEnv = std::shared_ptr<void>(envHandle, [](IPLhandle envHandle) { iplDestroyEnvironment(&envHandle); });
-			util::ScopeGuard sgEnvironment([this]() mutable { m_iplEnv = nullptr; });
+			pragma::util::ScopeGuard sgEnvironment([this]() mutable { m_iplEnv = nullptr; });
 
 			if(m_finalizeData->working == false)
 				return; // Cancel pending operations
@@ -379,8 +379,8 @@ void ipl::Scene::Finalize(const std::shared_ptr<VFilePtrInternal> &f, const Fina
 				// Propagation
 				for(auto &src : m_propagationSoundSources) {
 					IPLSphere sourceInfluence {};
-					sourceInfluence.center = al::to_custom_vector<IPLVector3>(al::to_audio_position(src.origin));
-					sourceInfluence.radius = al::to_audio_distance(src.radius);
+					sourceInfluence.center = pragma::audio::to_custom_vector<IPLVector3>(pragma::audio::to_audio_position(src.origin));
+					sourceInfluence.radius = pragma::audio::to_audio_distance(src.radius);
 
 					std::hash<std::string> hash {};
 					IPLBakedDataIdentifier identifier {static_cast<IPLint32>(hash(src.name + "_staticsource")), IPLBakedDataType::IPL_BAKEDDATATYPE_STATICSOURCE};
@@ -521,7 +521,7 @@ static FMOD_PLUGINLIST gPluginList[] =
 }
 void ipl::Scene::Finalize(const FinalizeInfo &info, const std::function<void(LoadStage, float)> &fStageProgress, const std::function<void(void)> &fOnComplete, const std::function<void(IPLerror)> &errorHandler)
 {
-	std::shared_ptr<VFilePtrInternal> f = nullptr;
+	std::shared_ptr<fs::VFilePtrInternal> f = nullptr;
 	Finalize(f, info, fStageProgress, fOnComplete, errorHandler);
 }
 
@@ -551,7 +551,7 @@ void ipl::Scene::RegisterPropagationSoundSource(const std::string &name, const V
 {
 	if(IsFinalized())
 		throw std::logic_error("Cannot register propagation sound source to scene after scene has been finalized!");
-	auto it = std::find_if(m_propagationSoundSources.begin(), m_propagationSoundSources.end(), [&name](const PropagationSoundSource &src) { return ustring::compare(src.name, name, false); });
+	auto it = std::find_if(m_propagationSoundSources.begin(), m_propagationSoundSources.end(), [&name](const PropagationSoundSource &src) { return pragma::string::compare(src.name, name, false); });
 	if(it == m_propagationSoundSources.end()) {
 		m_propagationSoundSources.push_back({});
 		it = m_propagationSoundSources.end() - 1;
@@ -583,7 +583,7 @@ IPLSimulationSettings &ipl::Scene::GetSimulationSettings() { return m_iplSimSett
 bool ipl::Scene::IsPropagationDelayEnabled() const { return m_bPropagationDelayEnabled; }
 void ipl::Scene::SetPropagationDelayEnabled(bool b) { m_bPropagationDelayEnabled = b; }
 
-IPLerror ipl::Scene::Load(const std::shared_ptr<VFilePtrInternal> &f, IPLLoadSceneProgressCallback callback)
+IPLerror ipl::Scene::Load(const std::shared_ptr<fs::VFilePtrInternal> &f, IPLLoadSceneProgressCallback callback)
 {
 	std::array<uint8_t, 3> header;
 	f->Read(header.data(), header.size() * sizeof(header.front()));
@@ -726,13 +726,13 @@ const std::shared_ptr<ipl::Context> &ipl::Scene::GetContext() const { return m_c
 IPLDirectSoundPath ipl::Scene::GetDirectSoundPath(const Vector3 &listenerPos, const Vector3 &listenerDir, const Vector3 &listenerUp, const Vector3 &srcPos, float srcRadius) const
 {
 	IPLSource src {};
-	src.position = al::to_custom_vector<IPLVector3>(al::to_audio_position(srcPos));
+	src.position = pragma::audio::to_custom_vector<IPLVector3>(pragma::audio::to_audio_position(srcPos));
 	src.ahead = IPLVector3 {1.f, 0.f, 0.f};
 	src.directivity.dipoleWeight = 0.f; // TODO
 	src.right = IPLVector3 {0.f, 0.f, -1.f};
 	src.up = IPLVector3 {0.f, 1.f, 0.f};
-	return iplGetDirectSoundPath(SceneState::get()->environmentalRenderer(), al::to_custom_vector<IPLVector3>(al::to_audio_position(listenerPos)), al::to_custom_vector<IPLVector3>(al::to_audio_direction(listenerDir)), al::to_custom_vector<IPLVector3>(al::to_audio_direction(listenerUp)),
-	  src, al::to_audio_distance(srcRadius), IPLDirectOcclusionMode::IPL_DIRECTOCCLUSION_NOTRANSMISSION, IPLDirectOcclusionMethod::IPL_DIRECTOCCLUSION_VOLUMETRIC);
+	return iplGetDirectSoundPath(SceneState::get()->environmentalRenderer(), pragma::audio::to_custom_vector<IPLVector3>(pragma::audio::to_audio_position(listenerPos)), pragma::audio::to_custom_vector<IPLVector3>(pragma::audio::to_audio_direction(listenerDir)), pragma::audio::to_custom_vector<IPLVector3>(pragma::audio::to_audio_direction(listenerUp)),
+	  src, pragma::audio::to_audio_distance(srcRadius), IPLDirectOcclusionMode::IPL_DIRECTOCCLUSION_NOTRANSMISSION, IPLDirectOcclusionMethod::IPL_DIRECTOCCLUSION_VOLUMETRIC);
 }
 
 #endif

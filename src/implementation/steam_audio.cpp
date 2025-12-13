@@ -4,7 +4,7 @@
 module pragma.soundsystem;
 
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
-void al::ISoundSystem::ClearSteamAudioScene()
+void pragma::audio::ISoundSystem::ClearSteamAudioScene()
 {
 	for(auto &pSource : m_sources) {
 		if(pSource == nullptr)
@@ -15,7 +15,7 @@ void al::ISoundSystem::ClearSteamAudioScene()
 	m_iplContext = nullptr;
 }
 
-ipl::Scene *al::ISoundSystem::InitializeSteamAudioScene()
+ipl::Scene *pragma::audio::ISoundSystem::InitializeSteamAudioScene()
 {
 	m_iplContext = ipl::Context::Create(GetAudioFrameSampleCount());
 	if(m_iplContext == nullptr)
@@ -32,9 +32,9 @@ ipl::Scene *al::ISoundSystem::InitializeSteamAudioScene()
 	m_iplScene = m_iplContext->CreateScene();
 	return m_iplScene.get();
 }
-ipl::Scene *al::ISoundSystem::GetSteamAudioScene() { return m_iplScene.get(); }
+ipl::Scene *pragma::audio::ISoundSystem::GetSteamAudioScene() { return m_iplScene.get(); }
 
-void al::ISoundSystem::SetSteamAudioEnabled(bool b)
+void pragma::audio::ISoundSystem::SetSteamAudioEnabled(bool b)
 {
 	m_bSteamAudioEnabled = b;
 	for(auto &pSource : m_sources) {
@@ -46,11 +46,11 @@ void al::ISoundSystem::SetSteamAudioEnabled(bool b)
 	if(b == false)
 		ClearSteamAudioScene();
 }
-bool al::ISoundSystem::IsSteamAudioEnabled() const { return m_bSteamAudioEnabled; }
-const al::steam_audio::Properties &al::ISoundSystem::GetSteamAudioProperties() const { return const_cast<ISoundSystem *>(this)->GetSteamAudioProperties(); }
-al::steam_audio::Properties &al::ISoundSystem::GetSteamAudioProperties() { return m_steamAudioProperties; }
-void al::ISoundSystem::SetSteamAudioSpatializerEnabled(bool b) { m_bSteamAudioSpatializerEnabled = b; }
-void al::ISoundSystem::SetSteamAudioReverbEnabled(bool b) { m_bSteamAudioReverbEnabled = b; }
-util::Overridable<bool> &al::ISoundSystem::GetSteamAudioSpatializerEnabled() { return m_bSteamAudioSpatializerEnabled; }
-util::Overridable<bool> &al::ISoundSystem::GetSteamAudioReverbEnabled() { return m_bSteamAudioReverbEnabled; }
+bool pragma::audio::ISoundSystem::IsSteamAudioEnabled() const { return m_bSteamAudioEnabled; }
+const pragma::audio::steam_audio::Properties &pragma::audio::ISoundSystem::GetSteamAudioProperties() const { return const_cast<ISoundSystem *>(this)->GetSteamAudioProperties(); }
+pragma::audio::steam_audio::Properties &pragma::audio::ISoundSystem::GetSteamAudioProperties() { return m_steamAudioProperties; }
+void pragma::audio::ISoundSystem::SetSteamAudioSpatializerEnabled(bool b) { m_bSteamAudioSpatializerEnabled = b; }
+void pragma::audio::ISoundSystem::SetSteamAudioReverbEnabled(bool b) { m_bSteamAudioReverbEnabled = b; }
+pragma::util::Overridable<bool> &pragma::audio::ISoundSystem::GetSteamAudioSpatializerEnabled() { return m_bSteamAudioSpatializerEnabled; }
+pragma::util::Overridable<bool> &pragma::audio::ISoundSystem::GetSteamAudioReverbEnabled() { return m_bSteamAudioReverbEnabled; }
 #endif
