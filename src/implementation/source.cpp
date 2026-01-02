@@ -156,7 +156,6 @@ void pragma::audio::ISoundChannel::RemoveEffect(uint32_t slotId)
 }
 void pragma::audio::ISoundChannel::RemoveEffect(IEffect &effect)
 {
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	auto it = std::find_if(m_effects.begin(), m_effects.end(), [&effect](const std::pair<std::shared_ptr<IEffect>, uint32_t> &pair) { return (pair.first.get() == &effect) ? true : false; });
 	if(it == m_effects.end())
 		return;
@@ -165,9 +164,6 @@ void pragma::audio::ISoundChannel::RemoveEffect(IEffect &effect)
 	m_effects.erase(it);
 	DoRemoveEffect(slotId);
 	effect.DetachSource(*this);
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-#endif
 }
 
 pragma::audio::ISoundSystem &pragma::audio::ISoundChannel::GetSoundSystem() const { return m_system; }

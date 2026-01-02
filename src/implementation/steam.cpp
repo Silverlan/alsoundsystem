@@ -21,7 +21,6 @@ void pragma::audio::SoundSource::InitializeSteamAudio()
 }
 bool pragma::audio::SoundSource::InitializeConvolutionEffect(const std::string &name)
 {
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 	if(m_iplConvolutionEffect != nullptr || m_decoder == nullptr)
 		return false;
 	auto &sys = GetSoundSystem();
@@ -36,10 +35,6 @@ bool pragma::audio::SoundSource::InitializeConvolutionEffect(const std::string &
 		return false;
 	auto err = iplCreateConvolutionEffect(iplScene->GetIplRenderer(), const_cast<char *>(name.c_str()), IPLSimulationType::IPL_SIMTYPE_REALTIME, iplScene->GetIplInputFormat(), iplScene->GetIplOutputFormat(), &m_iplConvolutionEffect);
 	return (err == IPLerror::IPL_STATUS_SUCCESS) ? true : false;
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	// FMOD TODO
-	return false;
-#endif
 }
 void pragma::audio::SoundSource::ClearSteamSoundEffects()
 {

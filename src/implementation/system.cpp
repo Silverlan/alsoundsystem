@@ -302,7 +302,6 @@ pragma::audio::PSoundSource pragma::audio::ISoundSystem::InitializeSource(const 
 }
 pragma::audio::PSoundSource pragma::audio::ISoundSystem::CreateSource(const std::string &name, bool bStereo, Type type)
 {
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_ALURE
 #if ALSYS_STEAM_AUDIO_SUPPORT_ENABLED == 1
 	if(IsSteamAudioEnabled() == false || bStereo == true)
 #endif
@@ -362,9 +361,6 @@ pragma::audio::PSoundSource pragma::audio::ISoundSystem::CreateSource(const std:
 		loadData.buffer = it->second;
 	}
 	return source;
-#endif
-#elif ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	return nullptr; // FMOD TODO
 #endif
 }
 const std::vector<pragma::audio::SoundSourceHandle> &pragma::audio::ISoundSystem::GetSources() const { return const_cast<ISoundSystem *>(this)->GetSources(); }

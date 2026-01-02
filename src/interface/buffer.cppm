@@ -30,12 +30,5 @@ export namespace pragma::audio {
 	};
 	class ISoundBuffer;
 	using PSoundBuffer = std::shared_ptr<ISoundBuffer>;
-
-#if ALSYS_LIBRARY_TYPE == ALSYS_LIBRARY_FMOD
-	class DLLALSYS Decoder : public ISoundBuffer {
-	  public:
-		using ISoundBuffer::ISoundBuffer;
-	};
-#endif
 };
 #pragma warning(pop)

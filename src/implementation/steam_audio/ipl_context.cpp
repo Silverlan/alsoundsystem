@@ -33,7 +33,7 @@ std::shared_ptr<ipl::Context> ipl::Context::Create(uint32_t frameSize)
 ipl::Context::Context(const std::shared_ptr<void> &context, uint32_t frameSize) : std::enable_shared_from_this<Context>(), m_iplContext(context)
 {
 	IPLRenderingSettings renderSettings = {};
-	renderSettings.samplingRate = ALSYS_INTERNAL_AUDIO_SAMPLE_RATE;
+	renderSettings.samplingRate = INTERNAL_AUDIO_SAMPLE_RATE;
 	renderSettings.frameSize = frameSize;
 	renderSettings.convolutionType = IPL_CONVOLUTIONTYPE_PHONON;
 

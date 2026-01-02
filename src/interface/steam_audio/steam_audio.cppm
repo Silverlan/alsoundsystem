@@ -203,7 +203,7 @@ export namespace ipl {
 	};
 
 	struct DLLALSYS AudioDataBuffer {
-		uint32_t frequency = ALSYS_INTERNAL_AUDIO_SAMPLE_RATE;
+		uint32_t frequency = INTERNAL_AUDIO_SAMPLE_RATE;
 		std::shared_ptr<AudioResampler> audioResampler = nullptr;
 	};
 };

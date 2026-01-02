@@ -73,4 +73,11 @@ export namespace pragma::audio {
 		float mGainHF; // For low-pass and band-pass filters
 		float mGainLF; // For high-pass and band-pass filters
 	};
+
+	constexpr uint32_t INTERNAL_AUDIO_SAMPLE_RATE = 44'100u;
+	constexpr uint32_t DECODER_FREQUENCY = INTERNAL_AUDIO_SAMPLE_RATE;
+
+	// FMOD
+	// constexpr uint32_t INTERNAL_AUDIO_SAMPLE_RATE = 48'000u;
+	// constexpr uint32_t DECODER_FREQUENCY = 44'100u;
 };
